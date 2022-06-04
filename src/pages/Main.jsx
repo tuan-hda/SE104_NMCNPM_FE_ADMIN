@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
-import { Layout, Breadcrumb } from 'antd';
-
+import { Layout, Breadcrumb, Avatar } from 'antd';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import AppMenu from '../components/AppMenu';
+import { UserOutlined } from '@ant-design/icons';
 import getCurrentPath from '../utils/getCurrentPath';
-const { Content, Footer } = Layout;
+const { Content, Footer, Header } = Layout;
 
 const Main = () => {
   const location = useLocation()
@@ -20,6 +20,11 @@ const Main = () => {
     <Layout className='min-h-screen' >
       <AppMenu />
       <Layout className="site-layout">
+        <Header
+          className='bg-white flex items-center justify-end p-4'>
+          <Avatar size='small' icon={<UserOutlined />} className='flex items-center justify-center' />
+          <p>Hoàng Đình Anh Tuấn</p>
+        </Header>
         <Content
           style={{
             margin: '0 16px',
@@ -32,7 +37,9 @@ const Main = () => {
               return <Breadcrumb.Item key={index}>{path}</Breadcrumb.Item>
             })}
           </Breadcrumb>
-          <Outlet />
+          <div className='-mt-4'>
+            <Outlet />
+          </div>
         </Content>
         <Footer
           style={{
