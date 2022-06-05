@@ -1,9 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Table, Input, Button, Space, Tooltip, Tag } from 'antd'
-import { SearchOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { Table, Input, Button, Space, Tooltip, Tag, Modal } from 'antd'
+import {
+  SearchOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  PlusCircleOutlined
+} from '@ant-design/icons'
 import appApi from '../api/appApi'
 import * as routes from '../api/apiRoutes'
-import useModal from 'antd/lib/modal/useModal'
+import useModal from '../utils/useModal'
+import FormProductModify from '../components/FormProductModify'
 
 // const data = [
 //   {
@@ -40,6 +46,7 @@ const Product = () => {
   const [loading, setLoading] = useState(false)
   const [searchValues, setSearchValues] = useState({})
   const [input, setInput] = useState({})
+  const [currItem, setCurrItem] = useState(null)
   const { isShowing, toggle } = useModal()
 
   // Fetch product data
@@ -83,14 +90,13 @@ const Product = () => {
     let filteredResult = result
     Object.keys(searchValues).forEach(k => {
       filteredResult = filteredResult.filter(item => {
-        // console.log(item[k] + ' - ' + searchValues[k])
         return compareStr(item[k], searchValues[k])
       })
     })
     setProduct(filteredResult)
   }, [searchValues])
 
-  const clearFiltersAndSearch = () => {
+  const clearFilters = () => {
     setSearchValues({})
   }
 
@@ -101,8 +107,9 @@ const Product = () => {
     })
   }
 
-  const showModal = () => {
+  const showModal = id => {
     toggle(true)
+    setCurrItem(result.filter(r => r.id === id)[0])
   }
 
   const handleCancel = () => {
@@ -139,7 +146,7 @@ const Product = () => {
           />
           <Space>
             <Button
-              type="primary"
+              type='primary'
               // onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
               onClick={e =>
                 setSearchValues({
@@ -148,11 +155,11 @@ const Product = () => {
                 })
               }
               icon={<SearchOutlined />}
-              size="small"
+              size='small'
               style={{
                 width: 90
               }}
-              className="flex items-center justify-between text-black"
+              className='flex items-center justify-between text-black'
             >
               Search
             </Button>
@@ -165,17 +172,17 @@ const Product = () => {
                 })
                 handleSearch('', dataIndex)
               }}
-              size="small"
+              size='small'
               style={{
                 width: 90
               }}
-              className="flex items-center justify-center text-black"
+              className='flex items-center justify-center text-black'
             >
               Reset
             </Button>
             <Button
-              type="link"
-              size="small"
+              type='link'
+              size='small'
               onClick={() => {
                 confirm({
                   closeDropdown: false
@@ -204,6 +211,14 @@ const Product = () => {
     }
   })
 
+  const confirm = () => {
+    Modal.confirm({
+      title: 'Warning',
+      content: 'Are you sure you want to remove this item?',
+      cancelText: 'Cancel'
+    })
+  }
+
   const columns = [
     {
       title: 'ID',
@@ -221,7 +236,7 @@ const Product = () => {
       ...getColumnSearchProps('itemName', 'name'),
       sorter: (a, b) => sort(a, b, 'itemName'),
       sortDirections: ['descend', 'ascend'],
-      render: (_, r) => <p className="font-medium">{r.itemName}</p>
+      render: (_, r) => <p className='font-medium'>{r.itemName}</p>
     },
     {
       title: 'Category',
@@ -246,9 +261,11 @@ const Product = () => {
       title: 'Featured',
       key: 'featured',
       width: 16,
+      sorter: (a, b) => sort(a, b, 'featured'),
+      sortDirections: ['descend', 'ascend'],
       render: (_, r) =>
         r.featuredData.value === 'Yes' ? (
-          <Tag color="#87d068">Yes</Tag>
+          <Tag color='#87d068'>Yes</Tag>
         ) : (
           <Tag>No</Tag>
         )
@@ -257,9 +274,11 @@ const Product = () => {
       title: 'Available',
       key: 'available',
       width: 16,
+      sorter: (a, b) => sort(a, b, 'available'),
+      sortDirections: ['descend', 'ascend'],
       render: (_, r) =>
         r.availableData.value === 'Available' ? (
-          <Tag color="#87d068">Yes</Tag>
+          <Tag color='#87d068'>Yes</Tag>
         ) : (
           <Tag>No</Tag>
         )
@@ -270,7 +289,7 @@ const Product = () => {
       key: 'itemImage',
       width: 20,
       render: (_, r) => (
-        <img className="w-16 h-16" src={r.itemImage} alt={r.itemName} />
+        <img className='w-16 h-16' src={r.itemImage} alt={r.itemName} />
       )
     },
     {
@@ -278,19 +297,24 @@ const Product = () => {
       key: 'operation',
       fixed: 'right',
       width: 18,
-      render: () => (
-        <div className="flex gap-4">
-          <Tooltip title="Edit">
+      render: (_, r) => (
+        <div className='flex gap-4'>
+          <Tooltip title='Edit'>
             <Button
-              onClick={showModal}
+              onClick={() => showModal(r.id)}
               icon={<EditOutlined />}
-              type="primary"
-              className="bg-blue-500"
+              type='primary'
+              className='bg-blue-500'
             />
           </Tooltip>
 
-          <Tooltip title="Remove">
-            <Button danger icon={<DeleteOutlined />} type="primary" />
+          <Tooltip title='Remove'>
+            <Button
+              onClick={confirm}
+              danger
+              icon={<DeleteOutlined />}
+              type='primary'
+            />
           </Tooltip>
         </div>
       )
@@ -299,14 +323,20 @@ const Product = () => {
 
   return (
     <React.Fragment>
-      <h1 className="flex items-center justify-between">
-        <strong className="text-xl">Product</strong>
-        <button
-          onClick={() => clearFiltersAndSearch()}
-          className="bg-color-primary text-white rounded-md p-2 mb-4 hover:bg-opacity-80 transition duration-300"
-        >
-          Clear Filters and Search
-        </button>
+      <h1 className='flex items-center justify-between mb-4'>
+        <strong className='text-xl'>Item list</strong>
+        <div className='flex gap-2'>
+          <Button
+            type='primary'
+            className='bg-blue-button flex items-center justify-center'
+          >
+            <PlusCircleOutlined />
+            Add
+          </Button>
+          <Button onClick={() => clearFilters()} className='text-black'>
+            Clear Filters
+          </Button>
+        </div>
       </h1>
       <Table
         columns={columns}
@@ -315,6 +345,15 @@ const Product = () => {
         scroll={{
           x: 1000
         }}
+      />
+
+      <FormProductModify
+        title='Edit Product'
+        isShowing={isShowing}
+        onCancel={handleCancel}
+        onCreate={handleSave}
+        initial={currItem}
+        setInitial={setCurrItem}
       />
     </React.Fragment>
   )
