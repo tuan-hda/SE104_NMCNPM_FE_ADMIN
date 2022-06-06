@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import HambursyLogo from '../images/hambursy-logo.png'
-import { Layout, Menu } from 'antd'
+import { Layout, Menu, Modal } from 'antd'
 import {
   TransactionOutlined,
   AppstoreOutlined,
@@ -8,19 +8,23 @@ import {
   UserOutlined
 } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { logoutInitiate } from '../actions'
+import { MdFastfood } from 'react-icons/md'
 const { Sider } = Layout
 
 const AppMenu = () => {
   const [collapsed, setCollapsed] = useState(false)
   const navigate = useNavigate()
 
-  function getItem(label, key, icon, onClick, children) {
+  function getItem(label, key, icon, onClick, style, children) {
     return {
       key,
       icon,
       children,
       label,
-      onClick
+      onClick,
+      style
     }
   }
 
@@ -28,16 +32,33 @@ const AppMenu = () => {
     navigate('/' + path)
   }
 
-  const logout = () => {}
+  const dispatch = useDispatch()
+
+  const confirm = () => {
+    Modal.confirm({
+      title: 'Warning',
+      content: 'Are you sure you want to sign out?',
+      cancelText: 'Cancel',
+      onOk: logout
+    })
+  }
+
+  const logout = () => {
+    dispatch(logoutInitiate())
+    navigate('/signin')
+  }
 
   // Return menu items here
   const items = [
-    getItem('Product', '1', <AppstoreOutlined />, () => redirectTo('product')),
-    getItem('User', '2', <UserOutlined />, () => redirectTo('user')),
-    getItem('Transaction', '3', <TransactionOutlined />, () =>
+    getItem('Order', '1', <MdFastfood />, () => redirectTo('order')),
+    getItem('Product', '2', <AppstoreOutlined />, () => redirectTo('product')),
+    getItem('User', '3', <UserOutlined />, () => redirectTo('user')),
+    getItem('Transaction', '4', <TransactionOutlined />, () =>
       redirectTo('transaction')
     ),
-    getItem('Logout', '9', <LogoutOutlined />, () => logout())
+    getItem('Sign out', '5', <LogoutOutlined />, () => confirm(), {
+      backgroundColor: 'transparent'
+    })
   ]
 
   return (
@@ -61,7 +82,7 @@ const AppMenu = () => {
         defaultSelectedKeys={['1']}
         mode='inline'
         items={items}
-      />
+      ></Menu>
     </Sider>
   )
 }

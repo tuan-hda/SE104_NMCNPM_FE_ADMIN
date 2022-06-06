@@ -1,20 +1,35 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Form, Input, Button, Checkbox } from 'antd'
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import Background from '../images/2999001.png'
+import { useDispatch, useSelector } from 'react-redux'
+import { signinInitiate } from '../actions'
+import LoadingScreen from '../components/LoadingScreen'
+import { clientDomain } from '../utils/clientDomain'
 
 const App = () => {
+  const { loading, currentUser } = useSelector(state => state.user)
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    if (currentUser) {
+      navigate('/')
+    }
+  }, [currentUser, navigate])
+
   const onFinish = values => {
-    console.log('Received values of form: ', values)
+    dispatch(signinInitiate(values.email, values.password))
   }
 
   return (
     <div className='flex items-center justify-center h-screen w-screen'>
+      <LoadingScreen loading={loading} />
       <img
         src={Background}
         alt='Background'
-        className='fixed top-0 left-0 -z-10'
+        className='fixed top-0 left-0 h-screen w-screen -z-10 object-cover'
       />
 
       {/* Actual Form */}
@@ -80,9 +95,9 @@ const App = () => {
               Log in
             </Button>
             Or{' '}
-            <Link to='/signup' className='text-blue-button'>
+            <a href={clientDomain + 'signup'} className='text-blue-button'>
               register now!
-            </Link>
+            </a>
           </Form.Item>
         </Form>
       </div>

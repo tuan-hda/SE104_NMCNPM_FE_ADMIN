@@ -48,6 +48,7 @@ const Product = () => {
   const [input, setInput] = useState({})
   const [currItem, setCurrItem] = useState(null)
   const { isShowing, toggle } = useModal()
+  const { isShowing: isShowing2, toggle: toggle2 } = useModal()
 
   // Fetch product data
   const fetchProduct = async () => {
@@ -215,7 +216,8 @@ const Product = () => {
     Modal.confirm({
       title: 'Warning',
       content: 'Are you sure you want to remove this item?',
-      cancelText: 'Cancel'
+      cancelText: 'Cancel',
+      okType: 'danger'
     })
   }
 
@@ -265,7 +267,7 @@ const Product = () => {
       sortDirections: ['descend', 'ascend'],
       render: (_, r) =>
         r.featuredData.value === 'Yes' ? (
-          <Tag color='#87d068'>Yes</Tag>
+          <Tag color='green'>Yes</Tag> // #87d068
         ) : (
           <Tag>No</Tag>
         )
@@ -278,7 +280,7 @@ const Product = () => {
       sortDirections: ['descend', 'ascend'],
       render: (_, r) =>
         r.availableData.value === 'Available' ? (
-          <Tag color='#87d068'>Yes</Tag>
+          <Tag color='green'>Yes</Tag> //#87d068
         ) : (
           <Tag>No</Tag>
         )
@@ -304,7 +306,7 @@ const Product = () => {
               onClick={() => showModal(r.id)}
               icon={<EditOutlined />}
               type='primary'
-              className='bg-blue-500'
+              className='bg-blue-button'
             />
           </Tooltip>
 
@@ -321,6 +323,11 @@ const Product = () => {
     }
   ]
 
+  const addProduct = () => {
+    toggle(true)
+    setCurrItem(null)
+  }
+
   return (
     <React.Fragment>
       <h1 className='flex items-center justify-between mb-4'>
@@ -329,6 +336,7 @@ const Product = () => {
           <Button
             type='primary'
             className='bg-blue-button flex items-center justify-center'
+            onClick={() => addProduct()}
           >
             <PlusCircleOutlined />
             Add
@@ -348,7 +356,7 @@ const Product = () => {
       />
 
       <FormProductModify
-        title='Edit Product'
+        title={currItem ? 'Edit Item' : 'Add Product'}
         isShowing={isShowing}
         onCancel={handleCancel}
         onCreate={handleSave}

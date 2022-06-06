@@ -30,7 +30,7 @@ const authReducer = (state = initialState, action) => {
         loading: false,
         currentUser: action.payload,
         error: null,
-        message: '',
+        message: ''
       }
 
     case types.SIGN_UP_FAIL:
@@ -44,7 +44,7 @@ const authReducer = (state = initialState, action) => {
         ...state,
         loading: false,
         error: action.payload,
-        message: '',
+        message: ''
       }
 
     case types.SET_USER:
@@ -52,7 +52,7 @@ const authReducer = (state = initialState, action) => {
         loading: false,
         error: null,
         currentUser: action.payload,
-        message: '',
+        message: ''
       }
 
     case types.LOG_OUT_SUCCESS:
@@ -72,18 +72,19 @@ const authReducer = (state = initialState, action) => {
       }
 
     case types.CHANGE_PASSWORD_SUCCESS:
-      return ({
+      return {
         ...state,
         loading: false,
         error: null,
         message: 'Password changed.'
-      })
+      }
 
     case types.RESET_ERROR:
-      return ({
+      return {
         ...state,
-        error: null
-      })
+        error: null,
+        loading: false
+      }
 
     default:
       return state

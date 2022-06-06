@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { Form, Input, Upload, Select, Switch, message, Modal } from 'antd'
+import { Form, Input, Upload, Select, Switch, message, Modal, Tag } from 'antd'
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons'
+import appApi from '../api/appApi'
+import * as routes from '../api/apiRoutes'
+import { useSelector } from 'react-redux'
 const { Option } = Select
 
 const categories = [
@@ -18,14 +21,14 @@ const FormProductModify = ({
   onCreate,
   onCancel,
   title,
-  initial,
-  setInitial
+  initial
 }) => {
   const [form] = Form.useForm()
   const featured = Form.useWatch('featured', form)
-  const available = Form.useWatch('available', form)
+  // const available = Form.useWatch('available', form)
   const [loading, setLoading] = useState(false)
   const [imgUrl, setImgUrl] = useState()
+  const { currentUser } = useSelector(state => state.user)
 
   useEffect(() => {
     if (isShowing) console.log(1)
@@ -34,20 +37,61 @@ const FormProductModify = ({
   const clearFields = () => {
     setImgUrl(false)
     setLoading(false)
-    setInitial(null)
   }
-
-  // useEffect(() => {
-  //   if (initial) {
-  //     setFeatured(initial.featured === 1)
-  //     setAvailable(initial.available === 1)
-  //   }
-  // }, [initial])
 
   const handleCancel = () => {
     onCancel()
     clearFields()
     form.resetFields()
+  }
+
+  const addItem = async values => {
+    try {
+      const token = await currentUser.getIdToken()
+      await appApi.post(
+        routes.ADD_ITEM,
+        routes.getAddItemBody(
+          values.name,
+          values.category,
+          values.image,
+          values.price,
+          values.calories,
+          values.featured
+        ),
+        routes.getAccessTokenHeader(token)
+      )
+
+      console.log('Success')
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const updateItem = async values => {
+    try {
+      const token = await currentUser.getIdToken()
+      await appApi.put(
+        routes.UPDATE_ITEM,
+        routes.getUpdateItemBody(
+          initial.id,
+          values.name,
+          values.category,
+          values.image,
+          values.price,
+          values.calories,
+          values.featured
+        ),
+        routes.getAccessTokenHeader(token)
+      )
+      console.log('Success')
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const handleResult = values => {
+    if (!initial) addItem(values)
+    else updateItem(values)
   }
 
   const onOk = () => {
@@ -57,6 +101,7 @@ const FormProductModify = ({
         form.resetFields()
         onCreate(values)
         console.log(values)
+        handleResult(values)
         clearFields()
       })
       .catch(info => {
@@ -94,7 +139,7 @@ const FormProductModify = ({
 
   useEffect(() => {
     form.resetFields()
-  }, [initial])
+  }, [initial, form])
 
   const uploadButton = (
     <div>
@@ -192,16 +237,9 @@ const FormProductModify = ({
         </Form.Item>
 
         {/* Available */}
-        <Form.Item
-          name='available'
-          label='Available'
-          initialValue={initial ? initial.available : true}
-        >
-          <Switch
-            className={`${available ? 'bg-blue-button' : 'bg-gray-200'}`}
-            // onChange={value => setAvailable(value)}
-            checked={available}
-          />
+        <Form.Item label='Available'>
+          {(!initial || initial.available) && <Tag color='green'>Yes</Tag>}
+          {initial && !initial.available && <Tag color='red'>No</Tag>}
         </Form.Item>
 
         {/* Image */}
