@@ -2,20 +2,21 @@ import React, { useState } from 'react'
 import HambursyLogo from '../images/hambursy-logo.png'
 import { Layout, Menu, Modal } from 'antd'
 import {
-  TransactionOutlined,
   AppstoreOutlined,
   LogoutOutlined,
   UserOutlined
 } from '@ant-design/icons'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { logoutInitiate } from '../actions'
 import { MdFastfood } from 'react-icons/md'
+import { TbDiscount2 } from 'react-icons/tb'
 const { Sider } = Layout
 
 const AppMenu = () => {
   const [collapsed, setCollapsed] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
 
   function getItem(label, key, icon, onClick, style, children) {
     return {
@@ -53,13 +54,27 @@ const AppMenu = () => {
     getItem('Order', '1', <MdFastfood />, () => redirectTo('order')),
     getItem('Product', '2', <AppstoreOutlined />, () => redirectTo('product')),
     getItem('User', '3', <UserOutlined />, () => redirectTo('user')),
-    getItem('Transaction', '4', <TransactionOutlined />, () =>
-      redirectTo('transaction')
-    ),
+    getItem('Promotion', '4', <TbDiscount2 />, () => redirectTo('promotion')),
     getItem('Sign out', '5', <LogoutOutlined />, () => confirm(), {
       backgroundColor: 'transparent'
     })
   ]
+
+  const getDefaultSelectedKeys = () => {
+    const pathname = location.pathname.substring(1)
+    switch (pathname) {
+      case 'order':
+        return ['1']
+      case 'product':
+        return ['2']
+      case 'user':
+        return ['3']
+      case 'promotion':
+        return ['4']
+      default:
+        return ['0']
+    }
+  }
 
   return (
     <Sider
@@ -79,7 +94,7 @@ const AppMenu = () => {
       </div>
       <Menu
         theme='dark'
-        defaultSelectedKeys={['1']}
+        defaultSelectedKeys={getDefaultSelectedKeys()}
         mode='inline'
         items={items}
       ></Menu>

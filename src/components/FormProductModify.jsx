@@ -21,18 +21,16 @@ const FormProductModify = ({
   onCreate,
   onCancel,
   title,
-  initial
+  initial,
+  fetchProduct
 }) => {
   const [form] = Form.useForm()
   const featured = Form.useWatch('featured', form)
+  const available = Form.useWatch('available', form)
   // const available = Form.useWatch('available', form)
   const [loading, setLoading] = useState(false)
-  const [imgUrl, setImgUrl] = useState()
+  const [imgUrl, setImgUrl] = useState(initial?.itemImage)
   const { currentUser } = useSelector(state => state.user)
-
-  useEffect(() => {
-    if (isShowing) console.log(1)
-  }, [isShowing])
 
   const clearFields = () => {
     setImgUrl(false)
@@ -48,6 +46,18 @@ const FormProductModify = ({
   const addItem = async values => {
     try {
       const token = await currentUser.getIdToken()
+      console.log(
+        'Add item: ',
+        routes.getAddItemBody(
+          values.name,
+          values.category,
+          values.image,
+          values.price,
+          values.calories,
+          values.featured,
+          values.available
+        )
+      )
       await appApi.post(
         routes.ADD_ITEM,
         routes.getAddItemBody(
@@ -56,11 +66,13 @@ const FormProductModify = ({
           values.image,
           values.price,
           values.calories,
-          values.featured
+          values.featured,
+          values.available
         ),
         routes.getAccessTokenHeader(token)
       )
 
+      await fetchProduct()
       console.log('Success')
     } catch (err) {
       console.log(err)
@@ -70,6 +82,19 @@ const FormProductModify = ({
   const updateItem = async values => {
     try {
       const token = await currentUser.getIdToken()
+      console.log(
+        'Update item: ',
+        routes.getUpdateItemBody(
+          initial.id,
+          values.name,
+          values.category,
+          values.image,
+          values.price,
+          values.calories,
+          values.featured,
+          values.available
+        )
+      )
       await appApi.put(
         routes.UPDATE_ITEM,
         routes.getUpdateItemBody(
@@ -79,10 +104,13 @@ const FormProductModify = ({
           values.image,
           values.price,
           values.calories,
-          values.featured
+          values.featured,
+          values.available
         ),
         routes.getAccessTokenHeader(token)
       )
+
+      await fetchProduct()
       console.log('Success')
     } catch (err) {
       console.log(err)
@@ -100,7 +128,6 @@ const FormProductModify = ({
       .then(values => {
         form.resetFields()
         onCreate(values)
-        console.log(values)
         handleResult(values)
         clearFields()
       })
@@ -139,6 +166,7 @@ const FormProductModify = ({
 
   useEffect(() => {
     form.resetFields()
+    setImgUrl(initial?.itemImage)
   }, [initial, form])
 
   const uploadButton = (
@@ -223,6 +251,25 @@ const FormProductModify = ({
           <Input className='w-full' />
         </Form.Item>
 
+        {/* Calories */}
+        <Form.Item
+          name='calories'
+          label='Calories'
+          initialValue={initial?.calories || 0}
+          rules={[
+            {
+              required: true,
+              message: "You must enter product's calories!"
+            },
+            {
+              pattern: /^[0-9]*$/,
+              message: 'Calories must be an integer'
+            }
+          ]}
+        >
+          <Input className='w-full' />
+        </Form.Item>
+
         {/* Featured */}
         <Form.Item
           name='featured'
@@ -231,20 +278,32 @@ const FormProductModify = ({
         >
           <Switch
             className={`${featured ? 'bg-blue-button' : 'bg-gray-200'}`}
-            // onChange={value => setFeatured(value)}
             checked={featured}
           />
         </Form.Item>
 
         {/* Available */}
+        <Form.Item
+          name='available'
+          label='Available'
+          initialValue={initial ? initial.available : false}
+        >
+          <Switch
+            className={`${available ? 'bg-blue-button' : 'bg-gray-200'}`}
+            checked={available}
+          />
+        </Form.Item>
+
+        {/* Available 
         <Form.Item label='Available'>
           {(!initial || initial.available) && <Tag color='green'>Yes</Tag>}
           {initial && !initial.available && <Tag color='red'>No</Tag>}
         </Form.Item>
+        */}
 
         {/* Image */}
         {/* Upload image here. Since it's an asynchronous behaviour,  we need to implement some state handling here */}
-        <Form.Item name='image' label='Image'>
+        <Form.Item name='image' label='Image' initialValue={initial?.itemImage}>
           <Upload
             listType='picture-card'
             className='avatar-uploader'

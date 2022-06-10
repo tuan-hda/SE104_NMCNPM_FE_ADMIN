@@ -28,7 +28,7 @@ const Main = () => {
       )
       if (result.data.users.roleData.value !== 'Customer') {
         navigate('/notfound')
-      } else if (pathname === '/') navigate('/product')
+      } else if (pathname === '/') navigate('/order')
     } catch (err) {
       console.log(err)
     } finally {

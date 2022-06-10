@@ -10,6 +10,7 @@ import appApi from '../api/appApi'
 import * as routes from '../api/apiRoutes'
 import useModal from '../utils/useModal'
 import FormProductModify from '../components/FormProductModify'
+import { useSelector } from 'react-redux'
 
 // const data = [
 //   {
@@ -49,11 +50,15 @@ const Product = () => {
   const [currItem, setCurrItem] = useState(null)
   const { isShowing, toggle } = useModal()
   const { isShowing: isShowing2, toggle: toggle2 } = useModal()
+  const { currentUser } = useSelector(state => state.user)
 
   // Fetch product data
   const fetchProduct = async () => {
+    setLoading(true)
     try {
       result = await appApi.get(routes.GET_ITEM, routes.getItemParams('ALL'))
+
+      // console.log('Before formatted: ', result)
 
       // Add category to object
       result = result.data.items.map((item, index) => ({
@@ -66,16 +71,16 @@ const Product = () => {
       // Sort result by id
       result.sort((a, b) => a.id - b.id)
 
-      console.log(result)
+      console.log('After formatted: ', result)
       setProduct(result)
-      setLoading(false)
     } catch (err) {
       console.log(err)
+    } finally {
+      setLoading(false)
     }
   }
 
   useEffect(() => {
-    setLoading(true)
     fetchProduct()
   }, [])
 
@@ -212,13 +217,51 @@ const Product = () => {
     }
   })
 
-  const confirm = () => {
+  const confirm = id => {
     Modal.confirm({
       title: 'Warning',
       content: 'Are you sure you want to remove this item?',
       cancelText: 'Cancel',
-      okType: 'danger'
+      okType: 'danger',
+      onOk: () => deleteItem(id)
     })
+  }
+
+  const deleteItem = async id => {
+    try {
+      console.log(
+        'Delete item (use update): ',
+        routes.getUpdateItemBody(
+          id,
+          product[id].itemName,
+          product[id].typeValue,
+          product[id].itemImage,
+          product[id].price.substring(2),
+          product[id].calories,
+          product[id].featured,
+          0
+        )
+      )
+      const token = await currentUser.getIdToken()
+      await appApi.put(
+        routes.UPDATE_ITEM,
+        routes.getUpdateItemBody(
+          id,
+          product[id].itemName,
+          product[id].typeValue,
+          product[id].itemImage,
+          product[id].price.substring(2),
+          product[id].calories,
+          product[id].featured,
+          0
+        ),
+        routes.getAccessTokenHeader(token)
+      )
+      await fetchProduct()
+      console.log('Success')
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   const columns = [
@@ -258,6 +301,15 @@ const Product = () => {
       sorter: (a, b) => sort(a, b, 'price'),
       sortDirections: ['descend', 'ascend'],
       className: 'text-red-500'
+    },
+    {
+      title: 'Calories',
+      dataIndex: 'calories',
+      key: 'calories',
+      width: 20,
+      ...getColumnSearchProps('calories'),
+      sorter: (a, b) => sort(a, b, 'calories'),
+      sortDirections: ['descend', 'ascend']
     },
     {
       title: 'Featured',
@@ -312,10 +364,11 @@ const Product = () => {
 
           <Tooltip title='Remove'>
             <Button
-              onClick={confirm}
-              danger
+              onClick={() => confirm(r.id)}
+              danger={r.available}
               icon={<DeleteOutlined />}
               type='primary'
+              disabled={!r.available}
             />
           </Tooltip>
         </div>
@@ -331,7 +384,7 @@ const Product = () => {
   return (
     <React.Fragment>
       <h1 className='flex items-center justify-between mb-4'>
-        <strong className='text-xl'>Item list</strong>
+        <strong className='text-xl'>Item List</strong>
         <div className='flex gap-2'>
           <Button
             type='primary'
@@ -362,6 +415,7 @@ const Product = () => {
         onCreate={handleSave}
         initial={currItem}
         setInitial={setCurrItem}
+        fetchProduct={fetchProduct}
       />
     </React.Fragment>
   )

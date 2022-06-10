@@ -29,14 +29,16 @@ export const getAddItemBody = (
   itemImage,
   price,
   calories,
-  featured
+  featured,
+  available
 ) => ({
   itemName,
   type,
   itemImage,
   price,
   calories,
-  featured
+  featured,
+  available
 })
 
 // UPDATE ITEM
@@ -48,12 +50,17 @@ export const getUpdateItemBody = (
   itemImage,
   price,
   calories,
-  featured
+  featured,
+  available
 ) => ({
+  id,
   itemName,
   type,
   itemImage,
   price,
   calories,
-  featured
+  featured,
+  available
 })
+
+export const GET_RESTAURANT_ORDERS = 'display-order'

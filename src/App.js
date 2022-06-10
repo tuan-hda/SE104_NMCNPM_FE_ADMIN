@@ -3,9 +3,9 @@ import { Route, Routes } from 'react-router-dom'
 import Main from './pages/Main'
 import Product from './pages/Product'
 import User from './pages/User'
-import Transaction from './pages/Transaction'
+import Promotion from './pages/Promotion'
 import SignIn from './pages/SignIn'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { auth } from './firebase'
 import { setUser } from './actions'
 import NotFound from './pages/NotFound'
@@ -32,7 +32,7 @@ const App = () => {
       <Route path='/' element={<Main />}>
         <Route path='product' element={<Product />} />
         <Route path='user' element={<User />} />
-        <Route path='transaction' element={<Transaction />} />
+        <Route path='promotion' element={<Promotion />} />
         <Route path='order' element={<Order />} />
       </Route>
       <Route path='/notfound' element={<NotFound signout={true} />} />
