@@ -26,7 +26,12 @@ const Main = () => {
         routes.GET_PROFILE,
         routes.getAccessTokenHeader(token)
       )
-      if (result.data.users.roleData.value !== 'Customer') {
+      console.log(result.data.users)
+      if (
+        !['staff', 'admin'].includes(
+          result.data.users.roleData.value.toLowerCase()
+        )
+      ) {
         navigate('/notfound')
       } else if (pathname === '/') navigate('/order')
     } catch (err) {
