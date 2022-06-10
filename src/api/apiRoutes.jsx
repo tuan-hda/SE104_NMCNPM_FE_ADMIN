@@ -64,3 +64,16 @@ export const getUpdateItemBody = (
 })
 
 export const GET_RESTAURANT_ORDERS = 'display-order'
+// GET ALL USERS
+export const GET_ALL_USERS = 'get-all-users'
+
+// CHANGE ROLE
+export const CHANGE_ROLE = 'change-role'
+export const getChangeRoleBody = roleID => ({
+  roleID: roleID
+})
+export const getChangeRoleParams = id => ({
+  params: {
+    id: id
+  }
+})
