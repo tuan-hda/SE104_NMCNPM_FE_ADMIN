@@ -21,6 +21,27 @@ export const getAccessTokenHeader = token => ({
   }
 })
 
+const convertCategoryToInt = category => {
+  switch (category) {
+    case 'Combos':
+      return 0
+    case 'Hamburger':
+      return 1
+    case 'Chicken':
+      return 2
+    case 'Rice':
+      return 3
+    case 'Sides':
+      return 4
+    case 'Desserts':
+      return 5
+    case 'Drinks':
+      return 6
+    default:
+      return -1
+  }
+}
+
 // ADD ITEM
 export const ADD_ITEM = 'add-item'
 export const getAddItemBody = (
@@ -33,7 +54,7 @@ export const getAddItemBody = (
   available
 ) => ({
   itemName,
-  type,
+  type: convertCategoryToInt(type),
   itemImage,
   price,
   calories,
@@ -55,7 +76,7 @@ export const getUpdateItemBody = (
 ) => ({
   id,
   itemName,
-  type,
+  type: convertCategoryToInt(type),
   itemImage,
   price,
   calories,
@@ -64,6 +85,10 @@ export const getUpdateItemBody = (
 })
 
 export const GET_RESTAURANT_ORDERS = 'display-order'
+export const getRestaurantOrdersParams = id => ({
+  params: { id }
+})
+
 // GET ALL USERS
 export const GET_ALL_USERS = 'get-all-users'
 

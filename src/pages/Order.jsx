@@ -25,11 +25,11 @@ const Product = () => {
     try {
       const token = await currentUser.getIdToken()
 
-      // const result = await appApi.get(
-      //   routes.GET_RESTAURANT_ORDERS,
-      //   routes.getAccessTokenHeader(token)
-      // )
-      // console.log(result.data)
+      const result = await appApi.get(
+        routes.GET_RESTAURANT_ORDERS,
+        routes.getAccessTokenHeader(token)
+      )
+      console.log(result.data)
     } catch (err) {
       console.log(err)
     } finally {
@@ -38,7 +38,7 @@ const Product = () => {
   }
 
   useEffect(() => {
-    //fetchOrders()
+    fetchOrders()
   }, [])
 
   const sort = (a, b, key) => {
