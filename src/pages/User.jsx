@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Table, Input, Button, Space, Tooltip, Tag, Modal } from 'antd'
+import { Table, Input, Button, Space, Tooltip, Tag } from 'antd'
 import {
   SearchOutlined,
   EditOutlined,
@@ -22,7 +22,6 @@ const User = () => {
   const [input, setInput] = useState({})
   const [currItem, setCurrItem] = useState(null)
   const { isShowing, toggle } = useModal()
-  const { isShowing: isShowing2, toggle: toggle2 } = useModal()
   const { currentUser } = useSelector(state => state.user)
   const [isProfile,setModal] = useState(true)
 
@@ -32,18 +31,18 @@ const User = () => {
       const token = await currentUser.getIdToken()
       result = await appApi.get(routes.GET_ALL_USERS,routes.getAccessTokenHeader(token))
 
-      // Add category to object
       result = result.data.users.map((user, index) => ({
         ...user,
         roleValue: user.roleData.value,
         key: index
       }))
 
-      console.log(result)
       setUsers(result)
-      setLoading(false)
     } catch (err) {
       console.log(err)
+    }
+    finally {
+      setLoading(false)
     }
   }
 
@@ -268,6 +267,7 @@ const User = () => {
               danger
               icon={<EditOutlined />}
               type='primary'
+              hidden={r.roleValue==='Customer'}
             />
           </Tooltip>
         </div>

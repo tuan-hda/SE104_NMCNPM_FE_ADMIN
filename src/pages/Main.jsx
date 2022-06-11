@@ -26,7 +26,7 @@ const Main = () => {
         routes.GET_PROFILE,
         routes.getAccessTokenHeader(token)
       )
-      if (result.data.users.roleData.value !== 'Customer') {
+      if (result.data.users.roleData.value !== 'Admin') {
         navigate('/notfound')
       } else if (pathname === '/') navigate('/product')
     } catch (err) {

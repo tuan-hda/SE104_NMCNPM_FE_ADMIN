@@ -63,11 +63,7 @@ export const GET_ALL_USERS = 'get-all-users'
 
 // CHANGE ROLE
 export const CHANGE_ROLE = 'change-role'
-export const getChangeRoleBody = roleID => ({
-  roleID: roleID
-})
-export const getChangeRoleParams = id => ({
-  params: {
-    id: id
-  }
+export const getChangeRoleBody = (roleID,id) => ({
+  roleID: roleID,
+  id: id
 })

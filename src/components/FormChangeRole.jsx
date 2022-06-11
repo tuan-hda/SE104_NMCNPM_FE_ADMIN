@@ -9,8 +9,7 @@ const { Option } = Select
 
 const roles = [
     'Admin',
-    'Staff',
-    'Customer'
+    'Staff'
   ]
 
 const FormChangeRole = ({
@@ -45,10 +44,10 @@ const FormChangeRole = ({
       await appApi.put(
         routes.CHANGE_ROLE,
         routes.getChangeRoleBody(
-          convertToRoleID(values.role)
+          convertToRoleID(values.role),
+          initial.id
         ),
-        routes.getAccessTokenHeader(token),
-        routes.getChangeRoleParams(initial.id)
+        routes.getAccessTokenHeader(token)
       )
       console.log('Success')
     } catch (err) {
