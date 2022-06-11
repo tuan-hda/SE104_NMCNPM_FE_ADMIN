@@ -21,6 +21,27 @@ export const getAccessTokenHeader = token => ({
   }
 })
 
+const convertCategoryToInt = category => {
+  switch (category) {
+    case 'Combos':
+      return 0
+    case 'Hamburger':
+      return 1
+    case 'Chicken':
+      return 2
+    case 'Rice':
+      return 3
+    case 'Sides':
+      return 4
+    case 'Desserts':
+      return 5
+    case 'Drinks':
+      return 6
+    default:
+      return -1
+  }
+}
+
 // ADD ITEM
 export const ADD_ITEM = 'add-item'
 export const getAddItemBody = (
@@ -29,14 +50,16 @@ export const getAddItemBody = (
   itemImage,
   price,
   calories,
-  featured
+  featured,
+  available
 ) => ({
   itemName,
-  type,
+  type: convertCategoryToInt(type),
   itemImage,
   price,
   calories,
-  featured
+  featured,
+  available
 })
 
 // UPDATE ITEM
@@ -48,14 +71,22 @@ export const getUpdateItemBody = (
   itemImage,
   price,
   calories,
-  featured
+  featured,
+  available
 ) => ({
+  id,
   itemName,
-  type,
+  type: convertCategoryToInt(type),
   itemImage,
   price,
   calories,
-  featured
+  featured,
+  available
+})
+
+export const GET_RESTAURANT_ORDERS = 'display-order'
+export const getRestaurantOrdersParams = id => ({
+  params: { id }
 })
 
 // GET ALL USERS
@@ -66,4 +97,17 @@ export const CHANGE_ROLE = 'change-role'
 export const getChangeRoleBody = (roleID,id) => ({
   roleID: roleID,
   id: id
+})
+
+export const SIGN_UP = 'create-new-user'
+export const getSignupBody = (email, name) => ({
+  email: email,
+  name: name
+})
+
+export const CONFIRM_ORDER = 'confirm-order'
+export const getConfirmOrderParams = id => ({
+  params: {
+    id
+  }
 })

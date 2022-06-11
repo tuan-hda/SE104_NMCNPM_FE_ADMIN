@@ -23,13 +23,16 @@ const User = () => {
   const [currItem, setCurrItem] = useState(null)
   const { isShowing, toggle } = useModal()
   const { currentUser } = useSelector(state => state.user)
-  const [isProfile,setModal] = useState(true)
+  const [isProfile, setModal] = useState(true)
 
   // Fetch product data
   const fetchUser = async () => {
     try {
       const token = await currentUser.getIdToken()
-      result = await appApi.get(routes.GET_ALL_USERS,routes.getAccessTokenHeader(token))
+      result = await appApi.get(
+        routes.GET_ALL_USERS,
+        routes.getAccessTokenHeader(token)
+      )
 
       result = result.data.users.map((user, index) => ({
         ...user,
@@ -40,8 +43,7 @@ const User = () => {
       setUsers(result)
     } catch (err) {
       console.log(err)
-    }
-    finally {
+    } finally {
       setLoading(false)
     }
   }
@@ -80,7 +82,7 @@ const User = () => {
     })
   }
 
-  const showModal = (id,isProfile) => {
+  const showModal = (id, isProfile) => {
     toggle(true)
     setCurrItem(result.filter(r => r.id === id)[0])
     setModal(isProfile)
@@ -215,7 +217,7 @@ const User = () => {
       sortDirections: ['descend', 'ascend'],
       render: (_, r) => <p className=''>{r.email}</p>
     },
-    
+
     {
       title: 'Phone number',
       dataIndex: 'phoneNumber',
@@ -232,7 +234,7 @@ const User = () => {
       width: 16,
       sorter: (a, b) => sort(a, b, 'roleValue'),
       sortDirections: ['descend', 'ascend'],
-      render: (_, r) =>{
+      render: (_, r) => {
         switch (r.roleValue) {
           case 'Customer':
             return <Tag color='green'>Customer</Tag> //#87d068
@@ -242,8 +244,7 @@ const User = () => {
             return <Tag color='red'>Admin</Tag>
           default:
         }
-      }     
-        
+      }
     },
     {
       title: 'Action',
@@ -254,7 +255,7 @@ const User = () => {
         <div className='flex gap-4'>
           <Tooltip title='Profile'>
             <Button
-              onClick={() => showModal(r.id,true)}
+              onClick={() => showModal(r.id, true)}
               icon={<UserOutlined />}
               type='primary'
               className='bg-blue-button'
@@ -263,7 +264,7 @@ const User = () => {
 
           <Tooltip title='Change role'>
             <Button
-              onClick={() => showModal(r.id,false)}
+              onClick={() => showModal(r.id, false)}
               danger
               icon={<EditOutlined />}
               type='primary'
@@ -296,14 +297,14 @@ const User = () => {
 
       <FormProfile
         title={'Profile'}
-        isShowing={isShowing&&isProfile}
+        isShowing={isShowing && isProfile}
         onCancel={handleCancel}
         initial={currItem}
         setInitial={setCurrItem}
       />
       <FormChangeRole
         title={'Edit role'}
-        isShowing={isShowing&&!isProfile}
+        isShowing={isShowing && !isProfile}
         onCancel={handleCancel}
         onCreate={handleSave}
         initial={currItem}
