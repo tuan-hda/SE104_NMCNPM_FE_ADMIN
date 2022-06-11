@@ -3,6 +3,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        primary: '#E16246',
         'color-primary': '#E16246',
         'blue-button': '#40A9FF'
       }

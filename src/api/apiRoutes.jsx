@@ -115,3 +115,14 @@ export const getConfirmOrderParams = id => ({
     id
   }
 })
+
+export const CANCEL_ORDER = 'cancel-order'
+export const getCancelOrderBody = note => ({
+  note
+})
+
+export const CONFIRM_ORDER_DELIVERED = 'confirm-delivered'
+
+export const DISPLAY_ORDER_ITEM = 'display-order-items'
+
+export const GET_ALL_EXISTED_ORDERS = 'get-all-existed-orders'

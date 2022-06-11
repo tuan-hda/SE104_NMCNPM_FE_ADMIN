@@ -10,6 +10,7 @@ import { auth } from './firebase'
 import { setUser } from './actions'
 import NotFound from './pages/NotFound'
 import Order from './pages/Order'
+import AllOrders from './pages/AllOrders'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -34,6 +35,7 @@ const App = () => {
         <Route path='user' element={<User />} />
         <Route path='promotion' element={<Promotion />} />
         <Route path='order' element={<Order />} />
+        <Route path='all-orders' element={<AllOrders />} />
       </Route>
       <Route path='/notfound' element={<NotFound signout={true} />} />
       <Route path='*' element={<NotFound />} />
