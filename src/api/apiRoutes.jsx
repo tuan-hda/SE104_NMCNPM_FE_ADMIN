@@ -108,3 +108,10 @@ export const getSignupBody = (email, name) => ({
   email: email,
   name: name
 })
+
+export const CONFIRM_ORDER = 'confirm-order'
+export const getConfirmOrderParams = id => ({
+  params: {
+    id
+  }
+})

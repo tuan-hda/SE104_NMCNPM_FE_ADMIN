@@ -11,6 +11,7 @@ import * as routes from '../api/apiRoutes'
 import useModal from '../utils/useModal'
 import FormProductModify from '../components/FormProductModify'
 import { useSelector } from 'react-redux'
+import removeAccents from '../utils/removeAccents'
 
 // const data = [
 //   {
@@ -96,7 +97,10 @@ const Product = () => {
     let filteredResult = result
     Object.keys(searchValues).forEach(k => {
       filteredResult = filteredResult.filter(item => {
-        return compareStr(item[k], searchValues[k])
+        return compareStr(
+          removeAccents(String(item[k])),
+          removeAccents(searchValues[k])
+        )
       })
     })
     setProduct(filteredResult)

@@ -1,23 +1,30 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Table, Input, Button, Space, Tooltip, Tag, Modal } from 'antd'
-import { SearchOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { Table, Input, Button, Space, Tooltip, Tag, Modal, Divider } from 'antd'
+import {
+  SearchOutlined,
+  CloseSquareOutlined,
+  CheckSquareOutlined,
+  CloseCircleOutlined
+} from '@ant-design/icons'
 import appApi from '../api/appApi'
 import * as routes from '../api/apiRoutes'
-import useModal from '../utils/useModal'
-import FormProductModify from '../components/FormProductModify'
 import { useSelector } from 'react-redux'
+import removeAccents from '../utils/removeAccents'
 
-let result = []
+let pending = []
+let rest = []
 
 const Product = () => {
   const searchInput = useRef(null)
+  const [pendingOrders, setPendingOrders] = useState([])
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(false)
   const [searchValues, setSearchValues] = useState({})
   const [input, setInput] = useState({})
-  const [currItem, setCurrItem] = useState(null)
-  const { isShowing, toggle } = useModal()
   const { currentUser } = useSelector(state => state.user)
+
+  const getProvinceName = province =>
+    province.substring(province.indexOf('_') + 1)
 
   // Fetch orders
   const fetchOrders = async () => {
@@ -25,17 +32,41 @@ const Product = () => {
     try {
       const token = await currentUser.getIdToken()
 
-      const result = await appApi.get(
+      let result = await appApi.get(
         routes.GET_RESTAURANT_ORDERS,
         routes.getAccessTokenHeader(token)
       )
-      console.log(result.data)
+
+      result = result.data.orders.map((res, index) => ({
+        ...res,
+        address:
+          getProvinceName(res.deliAddress) +
+          ', ' +
+          getProvinceName(res.deliWard) +
+          ', ' +
+          getProvinceName(res.deliDistrict) +
+          ', ' +
+          getProvinceName(res.deliProvince),
+        key: index
+      }))
+
+      result.forEach(order => {
+        if (order.billstatus === 1) pending.push(order)
+        else rest.push(order)
+      })
+
+      setPendingOrders(pending)
+      setOrders(rest)
     } catch (err) {
       console.log(err)
     } finally {
       setLoading(false)
     }
   }
+
+  // useEffect(() => {
+  //   console.log(pendingOrders)
+  // }, [pendingOrders])
 
   useEffect(() => {
     fetchOrders()
@@ -50,13 +81,18 @@ const Product = () => {
   const compareStr = (s1, s2) => s1.toLowerCase().includes(s2.toLowerCase())
 
   useEffect(() => {
-    let filteredResult = result
+    if (!pending.length) return
+    let filteredResult = pending
+    console.log('FilteredResult: ' + filteredResult)
     Object.keys(searchValues).forEach(k => {
       filteredResult = filteredResult.filter(item => {
-        return compareStr(item[k], searchValues[k])
+        return compareStr(
+          removeAccents(String(item[k])),
+          removeAccents(searchValues[k])
+        )
       })
     })
-    setOrders(filteredResult)
+    setPendingOrders(filteredResult)
   }, [searchValues])
 
   const clearFilters = () => {
@@ -68,19 +104,6 @@ const Product = () => {
       ...searchValues,
       [dataIndex]: value
     })
-  }
-
-  const showModal = id => {
-    toggle(true)
-    setCurrItem(result.filter(r => r.id === id)[0])
-  }
-
-  const handleCancel = () => {
-    toggle(false)
-  }
-
-  const handleSave = () => {
-    toggle(false)
   }
 
   const getColumnSearchProps = (dataIndex, title) => ({
@@ -174,153 +197,216 @@ const Product = () => {
     }
   })
 
-  const confirm = () => {
+  const confirm = id => {
     Modal.confirm({
-      title: 'Warning',
-      content: 'Are you sure you want to remove this item?',
+      title: 'Confirm',
+      content: 'Confirm this order?',
       cancelText: 'Cancel',
-      okType: 'danger'
+      onOk: () => confirmOrder(id)
     })
   }
 
-  const columns = [
+  const cancel = () => {
+    Modal.confirm({
+      title: 'Cancel',
+      content: 'Cancel this order?',
+      cancelText: 'Cancel',
+      icon: <CloseCircleOutlined />
+    })
+  }
+
+  const confirmDelivered = id => {
+    Modal.confirm({
+      title: 'Confirm Delivered',
+      content: 'Confirm this order delivered?',
+      cancelText: 'Cancel'
+    })
+  }
+
+  const confirmOrder = async id => {
+    setLoading(true)
+    try {
+      // console.log(id)
+      const token = await currentUser.getIdToken()
+      await appApi.put(routes.CONFIRM_ORDER, null, {
+        ...routes.getAccessTokenHeader(token),
+        ...routes.getConfirmOrderParams(id)
+      })
+      fetchOrders()
+    } catch (err) {
+      console.log(err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const reformatDate = date => {
+    const dates = date.split('-')
+    return dates[2] + '-' + dates[1] + '-' + dates[0]
+  }
+
+  const columns = option => [
     {
       title: 'ID',
       dataIndex: 'id',
       key: 'id',
-      width: 8,
+      width: 6,
       sorter: (a, b) => sort(a, b, 'id'),
       sortDirections: ['descend', 'ascend']
     },
     {
-      title: 'Name',
-      dataIndex: 'itemName',
-      key: 'itemName',
-      width: 40,
-      ...getColumnSearchProps('itemName', 'name'),
-      sorter: (a, b) => sort(a, b, 'itemName'),
-      sortDirections: ['descend', 'ascend'],
-      render: (_, r) => <p className='font-medium'>{r.itemName}</p>
-    },
-    {
-      title: 'Category',
-      dataIndex: 'typeValue',
-      key: 'typeValue',
+      title: "Customer's name",
+      dataIndex: 'name',
+      key: 'name',
       width: 20,
-      ...getColumnSearchProps('typeValue', 'category'),
-      sorter: (a, b) => sort(a, b, 'typeValue'),
+      ...getColumnSearchProps('name', "Customer's name"),
+      sorter: (a, b) => sort(a, b, 'name'),
       sortDirections: ['descend', 'ascend']
     },
     {
-      title: 'Price',
-      dataIndex: 'price',
-      key: 'price',
-      width: 20,
-      ...getColumnSearchProps('price'),
-      sorter: (a, b) => sort(a, b, 'price'),
-      sortDirections: ['descend', 'ascend'],
-      className: 'text-red-500'
+      title: 'Total',
+      dataIndex: 'total',
+      key: 'total',
+      width: 10,
+      ...getColumnSearchProps('total'),
+      sorter: (a, b) => sort(a, b, 'total'),
+      sortDirections: ['descend', 'ascend']
     },
     {
-      title: 'Featured',
-      key: 'featured',
-      width: 16,
-      sorter: (a, b) => sort(a, b, 'featured'),
-      sortDirections: ['descend', 'ascend'],
-      render: (_, r) =>
-        r.featuredData.value === 'Yes' ? (
-          <Tag color='green'>Yes</Tag> // #87d068
-        ) : (
-          <Tag>No</Tag>
-        )
+      title: 'Address',
+      dataIndex: 'address',
+      key: 'address',
+      width: 30,
+      ...getColumnSearchProps('address'),
+      sorter: (a, b) => sort(a, b, 'address'),
+      sortDirections: ['descend', 'ascend']
     },
     {
-      title: 'Available',
-      key: 'available',
-      width: 16,
-      sorter: (a, b) => sort(a, b, 'available'),
+      title: 'Date',
+      key: 'date',
+      width: 10,
+      ...getColumnSearchProps('date'),
+      sorter: (a, b) => sort(a, b, 'date'),
       sortDirections: ['descend', 'ascend'],
-      render: (_, r) =>
-        r.availableData.value === 'Available' ? (
-          <Tag color='green'>Yes</Tag> //#87d068
-        ) : (
-          <Tag>No</Tag>
-        )
+      render: (_, r) => <p>{reformatDate(r.date.substring(0, 10))}</p>
     },
     {
-      title: 'Image',
-      dataIndex: 'itemImage',
-      key: 'itemImage',
-      width: 20,
-      render: (_, r) => (
-        <img className='w-16 h-16' src={r.itemImage} alt={r.itemName} />
-      )
+      title: 'Status',
+      key: 'billstatus',
+      width: 10,
+      sorter: (a, b) => sort(a, b, 'billstatus'),
+      sortDirections: ['descend', 'ascend'],
+      render: (_, r) => getStatusTag(r.billstatus)
     },
+    {
+      title: 'Note',
+      dataIndex: 'note',
+      key: 'note',
+      width: 16
+    },
+    Table.EXPAND_COLUMN,
     {
       title: 'Action',
       key: 'operation',
       fixed: 'right',
-      width: 18,
-      render: (_, r) => (
-        <div className='flex gap-4'>
-          <Tooltip title='Edit'>
-            <Button
-              onClick={() => showModal(r.id)}
-              icon={<EditOutlined />}
-              type='primary'
-              className='bg-blue-button'
-            />
-          </Tooltip>
+      width: 10,
+      render: (_, r) => {
+        // If this order was delivered successfully, no action is allowed
+        if (r.billstatus >= 3) return
 
-          <Tooltip title='Remove'>
-            <Button
-              onClick={confirm}
-              danger
-              icon={<DeleteOutlined />}
-              type='primary'
-            />
-          </Tooltip>
-        </div>
-      )
+        // if option return true, that mean this function is called to generate columns for non-pending orders (its status maybe in progress, delivered or canceled)
+        if (option) {
+          return (
+            <div className='flex w-full'>
+              <Tooltip title='Confirm delivered'>
+                <Button
+                  type='primary'
+                  className='bg-green-600 bg-opacity-70 hover:bg-opacity-100 hover:bg-green-600 border-0'
+                  onClick={() => confirmDelivered(r.id)}
+                  icon={<CheckSquareOutlined />}
+                />
+              </Tooltip>
+            </div>
+          )
+        }
+        return (
+          <div className='flex w-full justify-between'>
+            <Tooltip title='Cancel order'>
+              <Button
+                type='primary'
+                danger
+                className='bg-blue-button'
+                onClick={cancel}
+                icon={<CloseSquareOutlined />}
+              />
+            </Tooltip>
+            <Tooltip title='Confirm order'>
+              <Button
+                type='primary'
+                className='bg-blue-button'
+                onClick={() => confirm(r.id)}
+                icon={<CheckSquareOutlined />}
+              />
+            </Tooltip>
+          </div>
+        )
+      }
     }
   ]
+
+  const getStatusTag = status => {
+    switch (status) {
+      case 1:
+        return <Tag color='orange'>Pending</Tag>
+      case 2:
+        return <Tag color='blue'>In Progress</Tag>
+      case 3:
+        return <Tag color='green'>Delivered</Tag>
+      case 4:
+        return <Tag color='red'>Canceled</Tag>
+      default:
+        return <Tag>'Unknown'</Tag>
+    }
+  }
+
   return (
     <React.Fragment>
       <h1 className='flex items-center justify-between mb-4'>
         <strong className='text-xl'>Pending Orders</strong>
-        {/*         <div className='flex gap-2'>
-          <Button
-            type='primary'
-            className='bg-blue-button flex items-center justify-center'
-            onClick={() => addProduct()}
-          >
-            <PlusCircleOutlined />
-            Add
-          </Button>
-          <Button onClick={() => clearFilters()} className='text-black'>
-            Clear Filters
-          </Button>
-        </div> */}
-        <Button onClick={() => clearFilters()} className='text-black'>
+        <Button onClick={clearFilters} className='text-black'>
           Clear Filters
         </Button>
       </h1>
       <Table
-        columns={columns}
-        dataSource={orders}
+        columns={columns(0)}
+        dataSource={pendingOrders}
         loading={loading}
         scroll={{
-          x: 1000
+          x: 1300
+        }}
+        expandable={{
+          columnWidth: 5
         }}
       />
 
-      <FormProductModify
-        title={currItem ? 'Edit Item' : 'Add Product'}
-        isShowing={isShowing}
-        onCancel={handleCancel}
-        onCreate={handleSave}
-        initial={currItem}
-        setInitial={setCurrItem}
+      <Divider />
+
+      <h1 className='flex items-center justify-between mb-4'>
+        <strong className='text-xl'>Orders</strong>
+        <Button onClick={clearFilters} className='text-black'>
+          Clear Filters
+        </Button>
+      </h1>
+      <Table
+        columns={columns(1)}
+        dataSource={orders}
+        loading={loading}
+        scroll={{
+          x: 1300
+        }}
+        expandable={{
+          columnWidth: 5
+        }}
       />
     </React.Fragment>
   )
