@@ -163,7 +163,7 @@ const FormPromotionModify = ({
         style={{
           marginTop: 8
         }}
-      >
+      >~
         Upload
       </div>
     </div>
