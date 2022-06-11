@@ -111,3 +111,24 @@ export const getConfirmOrderParams = id => ({
     id
   }
 })
+
+// GET ALL PROMOTION
+export const GET_ALL_PROMOTION = 'get-promotion'
+export const getPromotionConfig = (token,id) => ({
+  headers: {
+    Authorization: 'Bearer ' + token
+  },
+  params: {
+    id: id
+  }
+})
+
+// ADD PROMOTION
+export const ADD_PROMOTION = 'add-promotion'
+export const getAddPromotionBody = (promotionName,begin,end,value,banner) => ({
+  promotionName,
+  begin,
+  end,
+  value,
+  banner
+})
