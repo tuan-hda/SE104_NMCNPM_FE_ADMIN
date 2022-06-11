@@ -4,10 +4,11 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import AppMenu from '../components/AppMenu'
 import { UserOutlined } from '@ant-design/icons'
 import getCurrentPath from '../utils/getCurrentPath'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import LoadingScreen from '../components/LoadingScreen'
 import appApi from '../api/appApi'
 import * as routes from '../api/apiRoutes'
+import { updateRole } from '../actions'
 const { Content, Footer, Header } = Layout
 
 const Main = () => {
@@ -15,10 +16,11 @@ const Main = () => {
   const pathname = location.pathname
   const navigate = useNavigate()
   const [fetching, setFetching] = useState(false)
+  const dispatch = useDispatch()
 
   const { currentUser, loading } = useSelector(state => state.user)
 
-  const fetctProfile = async pathname => {
+  const fetchProfile = async pathname => {
     setFetching(true)
     try {
       const token = await currentUser.getIdToken()
@@ -33,7 +35,10 @@ const Main = () => {
         )
       ) {
         navigate('/notfound')
-      } else if (pathname === '/') navigate('/order')
+      } else {
+        dispatch(updateRole(result.data.users.roleData.value.toLowerCase()))
+        if (pathname === '/') navigate('/order')
+      }
     } catch (err) {
       console.log(err)
     } finally {
@@ -44,8 +49,8 @@ const Main = () => {
   useEffect(() => {
     if (!loading && !currentUser) {
       navigate('/signin')
-    } else {
-      fetctProfile(pathname)
+    } else if (currentUser) {
+      fetchProfile(pathname)
     }
   }, [currentUser, loading, navigate])
 

@@ -11,6 +11,7 @@ import { useDispatch } from 'react-redux'
 import { logoutInitiate } from '../actions'
 import { MdFastfood } from 'react-icons/md'
 import { TbDiscount2 } from 'react-icons/tb'
+import { GiFoodTruck } from 'react-icons/gi'
 const { Sider } = Layout
 
 const AppMenu = () => {
@@ -52,10 +53,11 @@ const AppMenu = () => {
   // Return menu items here
   const items = [
     getItem('Order', '1', <MdFastfood />, () => redirectTo('order')),
-    getItem('Product', '2', <AppstoreOutlined />, () => redirectTo('product')),
-    getItem('User', '3', <UserOutlined />, () => redirectTo('user')),
-    getItem('Promotion', '4', <TbDiscount2 />, () => redirectTo('promotion')),
-    getItem('Sign out', '5', <LogoutOutlined />, () => confirm(), {
+    getItem('All Orders', '2', <GiFoodTruck />, () => redirectTo('all-orders')),
+    getItem('Product', '3', <AppstoreOutlined />, () => redirectTo('product')),
+    getItem('User', '4', <UserOutlined />, () => redirectTo('user')),
+    getItem('Promotion', '5', <TbDiscount2 />, () => redirectTo('promotion')),
+    getItem('Sign out', '6', <LogoutOutlined />, () => confirm(), {
       backgroundColor: 'transparent'
     })
   ]
@@ -65,12 +67,14 @@ const AppMenu = () => {
     switch (pathname) {
       case 'order':
         return ['1']
-      case 'product':
+      case 'all-orders':
         return ['2']
-      case 'user':
+      case 'product':
         return ['3']
-      case 'promotion':
+      case 'user':
         return ['4']
+      case 'promotion':
+        return ['5']
       default:
         return ['0']
     }

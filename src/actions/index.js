@@ -8,7 +8,7 @@ const signinStart = () => ({
   type: types.SIGN_IN_START
 })
 
-const signinSuccess = (user) => ({
+const signinSuccess = user => ({
   type: types.SIGN_IN_SUCCESS,
   payload: user
 })
@@ -25,11 +25,10 @@ export const signinInitiate = (email, password) => dispatch => {
     .then(({ user }) => {
       dispatch(signinSuccess(user))
     })
-    .catch((err) => {
+    .catch(err => {
       dispatch(signinFail(err.message))
     })
 }
-
 
 // SIGN UP
 
@@ -37,7 +36,7 @@ const signupStart = () => ({
   type: types.SIGN_UP_START
 })
 
-const signupSuccess = (user) => ({
+const signupSuccess = user => ({
   type: types.SIGN_UP_SUCCESS,
   payload: user
 })
@@ -59,11 +58,10 @@ export const signupInitiate = (email, password, name) => dispatch => {
         })
         .then(() => dispatch(signupSuccess(user)))
     })
-    .catch((err) => {
+    .catch(err => {
       dispatch(signupFail(err.message))
     })
 }
-
 
 // Set user from local storage
 
@@ -71,7 +69,6 @@ export const setUser = user => ({
   type: types.SET_USER,
   payload: user
 })
-
 
 // LOG OUT
 
@@ -93,9 +90,8 @@ export const logoutInitiate = () => dispatch => {
   auth
     .signOut()
     .then(() => dispatch(logoutSuccess))
-    .catch((err) => dispatch(logoutFail(err)))
+    .catch(err => dispatch(logoutFail(err)))
 }
-
 
 // GOOGLE SIGN IN
 
@@ -103,7 +99,7 @@ const googleSigninStart = () => ({
   type: types.GOOGLE_SIGN_IN_START
 })
 
-const googleSigninSuccess = (user) => ({
+const googleSigninSuccess = user => ({
   type: types.GOOGLE_SIGN_IN_SUCCESS,
   payload: user
 })
@@ -120,7 +116,7 @@ export const googleSigninInitiate = () => dispatch => {
     .then(({ user }) => {
       dispatch(googleSigninSuccess(user))
     })
-    .catch((err) => {
+    .catch(err => {
       dispatch(googleSigninFail(err.message))
     })
 }
@@ -131,7 +127,7 @@ const facebookSigninStart = () => ({
   type: types.FACEBOOK_SIGN_IN_START
 })
 
-const facebookSigninSuccess = (user) => ({
+const facebookSigninSuccess = user => ({
   type: types.FACEBOOK_SIGN_IN_SUCCESS,
   payload: user
 })
@@ -148,7 +144,7 @@ export const facebookSigninInitiate = () => dispatch => {
     .then(({ user }) => {
       dispatch(facebookSigninSuccess(user))
     })
-    .catch((err) => {
+    .catch(err => {
       dispatch(facebookSigninFail(err.message))
     })
 }
@@ -163,7 +159,7 @@ const resetPasswordSuccess = () => ({
   type: types.RESET_PASSWORD_SUCCESS
 })
 
-const resetPasswordFail = (err) => ({
+const resetPasswordFail = err => ({
   type: types.RESET_PASSWORD_FAIL,
   payload: err
 })
@@ -173,7 +169,7 @@ export const resetPasswordInitiate = email => dispatch => {
   auth
     .sendPasswordResetEmail(email)
     .then(() => dispatch(resetPasswordSuccess()))
-    .catch((err) => {
+    .catch(err => {
       dispatch(resetPasswordFail(err.message))
     })
 }
@@ -188,21 +184,28 @@ const changePasswordSuccess = () => ({
   type: types.CHANGE_PASSWORD_SUCCESS
 })
 
-const changePasswordFail = (err) => ({
+const changePasswordFail = err => ({
   type: types.CHANGE_PASSWORD_FAIL,
   payload: err
 })
 
-export const changePasswordInitiate = (currentUser, newPassword) => dispatch => {
-  dispatch(changePasswordStart())
-  currentUser
-    .updatePassword(newPassword)
-    .then(() => dispatch(changePasswordSuccess()))
-    .catch(err => {
-      dispatch(changePasswordFail(err.message))
-    })
-}
+export const changePasswordInitiate =
+  (currentUser, newPassword) => dispatch => {
+    dispatch(changePasswordStart())
+    currentUser
+      .updatePassword(newPassword)
+      .then(() => dispatch(changePasswordSuccess()))
+      .catch(err => {
+        dispatch(changePasswordFail(err.message))
+      })
+  }
 
 export const resetError = () => ({
   type: types.RESET_ERROR
+})
+
+// UPDATE ROLE
+export const updateRole = role => ({
+  type: types.UPDATE_ROLE,
+  payload: role
 })

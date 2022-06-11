@@ -10,21 +10,21 @@ import appApi from '../api/appApi'
 import * as routes from '../api/apiRoutes'
 import { useSelector } from 'react-redux'
 import removeAccents from '../utils/removeAccents'
+import ExpandOrderItem from '../components/ExpandOrderItem'
+import getProvinceName from '../utils/getProvinceName'
 
 let pending = []
 let rest = []
 
-const Product = () => {
+const Orders = ({ initial }) => {
   const searchInput = useRef(null)
   const [pendingOrders, setPendingOrders] = useState([])
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(false)
   const [searchValues, setSearchValues] = useState({})
+  const [searchValues2, setSearchValues2] = useState({})
   const [input, setInput] = useState({})
   const { currentUser } = useSelector(state => state.user)
-
-  const getProvinceName = province =>
-    province.substring(province.indexOf('_') + 1)
 
   // Fetch orders
   const fetchOrders = async () => {
@@ -32,8 +32,11 @@ const Product = () => {
     try {
       const token = await currentUser.getIdToken()
 
+      pending = []
+      rest = []
+
       let result = await appApi.get(
-        routes.GET_RESTAURANT_ORDERS,
+        initial ? routes.GET_ALL_EXISTED_ORDERS : routes.GET_RESTAURANT_ORDERS,
         routes.getAccessTokenHeader(token)
       )
 
@@ -50,10 +53,17 @@ const Product = () => {
         key: index
       }))
 
-      result.forEach(order => {
-        if (order.billstatus === 1) pending.push(order)
-        else rest.push(order)
+      result.forEach((order, index) => {
+        const order_m = {
+          ...order,
+          key: index
+        }
+        if (order.billstatus === 1) pending.push(order_m)
+        else rest.push(order_m)
       })
+
+      pending.sort((a, b) => a.id - b.id)
+      rest.sort((a, b) => b.id - a.id)
 
       setPendingOrders(pending)
       setOrders(rest)
@@ -70,6 +80,11 @@ const Product = () => {
 
   useEffect(() => {
     fetchOrders()
+
+    let timer = setInterval(() => {
+      fetchOrders()
+    }, 60000)
+    return () => clearInterval(timer)
   }, [])
 
   const sort = (a, b, key) => {
@@ -81,32 +96,50 @@ const Product = () => {
   const compareStr = (s1, s2) => s1.toLowerCase().includes(s2.toLowerCase())
 
   useEffect(() => {
-    if (!pending.length) return
-    let filteredResult = pending
-    console.log('FilteredResult: ' + filteredResult)
-    Object.keys(searchValues).forEach(k => {
+    filterData(0, pending)
+  }, [searchValues])
+
+  useEffect(() => {
+    filterData(1, rest)
+  }, [searchValues2])
+
+  // type = 0 => filter pending orders
+  // type = 1 => filter the rest
+  const filterData = (type, data) => {
+    if (!data.length) return
+    let filteredResult = data
+    Object.keys(!type ? searchValues : searchValues2).forEach(k => {
       filteredResult = filteredResult.filter(item => {
         return compareStr(
           removeAccents(String(item[k])),
-          removeAccents(searchValues[k])
+          removeAccents(!type ? searchValues[k] : searchValues2[k])
         )
       })
     })
-    setPendingOrders(filteredResult)
-  }, [searchValues])
-
-  const clearFilters = () => {
-    setSearchValues({})
+    console.log('Filtered result: ', filteredResult)
+    if (!type) setPendingOrders(filteredResult)
+    else setOrders(filteredResult)
   }
 
-  const handleSearch = (value, dataIndex) => {
-    setSearchValues({
-      ...searchValues,
-      [dataIndex]: value
-    })
+  const clearFilters = type => {
+    if (!type) setSearchValues({})
+    else setSearchValues2({})
   }
 
-  const getColumnSearchProps = (dataIndex, title) => ({
+  const handleSearch = (value, dataIndex, type) => {
+    if (!type)
+      setSearchValues({
+        ...searchValues,
+        [dataIndex]: value
+      })
+    else
+      setSearchValues2({
+        ...searchValues2,
+        [dataIndex]: value
+      })
+  }
+
+  const getColumnSearchProps = (dataIndex, title, type) => ({
     filterDropdown: ({ confirm }) => {
       return (
         <div
@@ -124,7 +157,7 @@ const Product = () => {
                 [dataIndex]: e.target.value
               })
             }
-            onPressEnter={e => handleSearch(e.target.value, dataIndex)}
+            onPressEnter={e => handleSearch(e.target.value, dataIndex, type)}
             style={{
               marginBottom: 8,
               display: 'block'
@@ -134,12 +167,18 @@ const Product = () => {
             <Button
               type='primary'
               // onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-              onClick={e =>
-                setSearchValues({
-                  ...searchValues,
-                  [dataIndex]: e.target.value ? e.target.value : ''
-                })
-              }
+              onClick={e => {
+                if (!type)
+                  setSearchValues({
+                    ...searchValues,
+                    [dataIndex]: e.target.value ? e.target.value : ''
+                  })
+                else
+                  setSearchValues2({
+                    ...searchValues2,
+                    [dataIndex]: e.target.value ? e.target.value : ''
+                  })
+              }}
               icon={<SearchOutlined />}
               size='small'
               style={{
@@ -156,7 +195,7 @@ const Product = () => {
                   ...input,
                   [dataIndex]: ''
                 })
-                handleSearch('', dataIndex)
+                handleSearch('', dataIndex, type)
               }}
               size='small'
               style={{
@@ -206,12 +245,13 @@ const Product = () => {
     })
   }
 
-  const cancel = () => {
+  const cancel = id => {
     Modal.confirm({
       title: 'Cancel',
       content: 'Cancel this order?',
       cancelText: 'Cancel',
-      icon: <CloseCircleOutlined />
+      icon: <CloseCircleOutlined />,
+      onOk: () => cancelOrder(id)
     })
   }
 
@@ -219,8 +259,29 @@ const Product = () => {
     Modal.confirm({
       title: 'Confirm Delivered',
       content: 'Confirm this order delivered?',
-      cancelText: 'Cancel'
+      cancelText: 'Cancel',
+      onOk: () => confirmOrderDelivered(id)
     })
+  }
+
+  const cancelOrder = async id => {
+    setLoading(true)
+    try {
+      const token = await currentUser.getIdToken()
+      await appApi.put(
+        routes.CANCEL_ORDER,
+        routes.getCancelOrderBody(
+          'We are so sorry to tell you that this item is currently out-of-stock.'
+        ),
+        {
+          ...routes.getAccessTokenHeader(token),
+          ...routes.getConfirmOrderParams(id)
+        }
+      )
+      fetchOrders()
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   const confirmOrder = async id => {
@@ -235,8 +296,20 @@ const Product = () => {
       fetchOrders()
     } catch (err) {
       console.log(err)
-    } finally {
-      setLoading(false)
+    }
+  }
+
+  const confirmOrderDelivered = async id => {
+    setLoading(true)
+    try {
+      const token = await currentUser.getIdToken()
+      await appApi.put(routes.CONFIRM_ORDER_DELIVERED, null, {
+        ...routes.getAccessTokenHeader(token),
+        ...routes.getConfirmOrderParams(id)
+      })
+      fetchOrders()
+    } catch (err) {
+      console.log(err)
     }
   }
 
@@ -259,7 +332,7 @@ const Product = () => {
       dataIndex: 'name',
       key: 'name',
       width: 20,
-      ...getColumnSearchProps('name', "Customer's name"),
+      ...getColumnSearchProps('name', "Customer's name", option),
       sorter: (a, b) => sort(a, b, 'name'),
       sortDirections: ['descend', 'ascend']
     },
@@ -268,7 +341,7 @@ const Product = () => {
       dataIndex: 'total',
       key: 'total',
       width: 10,
-      ...getColumnSearchProps('total'),
+      ...getColumnSearchProps('total', null, option),
       sorter: (a, b) => sort(a, b, 'total'),
       sortDirections: ['descend', 'ascend']
     },
@@ -277,7 +350,7 @@ const Product = () => {
       dataIndex: 'address',
       key: 'address',
       width: 30,
-      ...getColumnSearchProps('address'),
+      ...getColumnSearchProps('address', null, option),
       sorter: (a, b) => sort(a, b, 'address'),
       sortDirections: ['descend', 'ascend']
     },
@@ -285,7 +358,7 @@ const Product = () => {
       title: 'Date',
       key: 'date',
       width: 10,
-      ...getColumnSearchProps('date'),
+      ...getColumnSearchProps('date', null, option),
       sorter: (a, b) => sort(a, b, 'date'),
       sortDirections: ['descend', 'ascend'],
       render: (_, r) => <p>{reformatDate(r.date.substring(0, 10))}</p>
@@ -310,9 +383,10 @@ const Product = () => {
       key: 'operation',
       fixed: 'right',
       width: 10,
-      render: (_, r) => {
+      render: (_, r, i) => {
         // If this order was delivered successfully, no action is allowed
-        if (r.billstatus >= 3) return
+        if (!option && pendingOrders[i].billstatus >= 3) return
+        if (option && orders[i].billstatus >= 3) return
 
         // if option return true, that mean this function is called to generate columns for non-pending orders (its status maybe in progress, delivered or canceled)
         if (option) {
@@ -336,7 +410,7 @@ const Product = () => {
                 type='primary'
                 danger
                 className='bg-blue-button'
-                onClick={cancel}
+                onClick={() => cancel(r.id)}
                 icon={<CloseSquareOutlined />}
               />
             </Tooltip>
@@ -373,43 +447,62 @@ const Product = () => {
     <React.Fragment>
       <h1 className='flex items-center justify-between mb-4'>
         <strong className='text-xl'>Pending Orders</strong>
-        <Button onClick={clearFilters} className='text-black'>
+        <Button onClick={() => clearFilters(0)} className='text-black'>
           Clear Filters
         </Button>
       </h1>
-      <Table
-        columns={columns(0)}
-        dataSource={pendingOrders}
-        loading={loading}
-        scroll={{
-          x: 1300
-        }}
-        expandable={{
-          columnWidth: 5
-        }}
-      />
-
+      {
+        <Table
+          columns={columns(0)}
+          dataSource={pendingOrders}
+          loading={loading}
+          scroll={{
+            x: 1300
+          }}
+          expandable={{
+            expandedRowRender: (_, index) => (
+              <ExpandOrderItem
+                currentUser={currentUser}
+                id={pendingOrders[index].id}
+              />
+            ),
+            columnWidth: 5,
+            defaultExpandAllRows: true,
+            defaultExpandedRowKeys: pendingOrders.map(o => o.key)
+          }}
+        />
+      }
       <Divider />
 
       <h1 className='flex items-center justify-between mb-4'>
         <strong className='text-xl'>Orders</strong>
-        <Button onClick={clearFilters} className='text-black'>
+        <Button onClick={() => clearFilters(1)} className='text-black'>
           Clear Filters
         </Button>
       </h1>
-      <Table
-        columns={columns(1)}
-        dataSource={orders}
-        loading={loading}
-        scroll={{
-          x: 1300
-        }}
-        expandable={{
-          columnWidth: 5
-        }}
-      />
+      {
+        <Table
+          columns={columns(1)}
+          dataSource={orders}
+          loading={loading}
+          scroll={{
+            x: 1300
+          }}
+          expandable={{
+            defaultExpandAllRows: true,
+            expandedRowRender: (_, index) => (
+              <ExpandOrderItem
+                currentUser={currentUser}
+                id={orders[index].id}
+              />
+            ),
+            columnWidth: 5,
+            defaultExpandedRowKeys: orders.map(o => o.key)
+          }}
+        />
+      }
     </React.Fragment>
   )
 }
 
-export default Product
+export default Orders
