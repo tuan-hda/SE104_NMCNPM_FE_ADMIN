@@ -94,9 +94,16 @@ export const GET_ALL_USERS = 'get-all-users'
 
 // CHANGE ROLE
 export const CHANGE_ROLE = 'change-role'
-export const getChangeRoleBody = (roleID,id) => ({
-  roleID: roleID,
-  id: id
+export const getChangeRoleConfig = (token,id,roleID) => ({
+  headers: {
+    Authorization: 'Bearer ' + token
+  },
+  params: {
+    id: id
+  },
+  data: {
+    roleID: roleID
+  }
 })
 
 export const SIGN_UP = 'create-new-user'
@@ -165,3 +172,36 @@ export const getStaffListConfig = (token,id) => ({
     id: id
   }
 })
+
+// UPDATE STAFF STATUS
+export const UPDATE_STAFF_STATUS = 'update-staff-status'
+export const getStaffStatusConfig = (token,id,staffStatus) => ({
+  headers: {
+    Authorization: 'Bearer ' + token
+  },
+  params: {
+    id: id
+  },
+  data: {
+    staffStatus: staffStatus
+  }
+})
+
+// ADD STAFF
+export const ADD_STAFF = 'add-new-staff'
+export const getAddStaffBody = (
+  email,
+  restaurantID
+) => ({
+  email,
+  restaurantID
+})
+
+// GET RESTAURANT
+export const GET_RESTAURANT = 'get-all-restaurants'
+export const getRestaurantParams = id => ({
+  params: {
+    id: id
+  }
+})
+

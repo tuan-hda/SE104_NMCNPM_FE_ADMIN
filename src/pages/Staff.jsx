@@ -3,27 +3,30 @@ import { Table, Input, Button, Space, Tooltip, Tag,Spin } from 'antd'
 import {
   SearchOutlined,
   EditOutlined,
-  UserOutlined
+  UserOutlined,
+  PlusCircleOutlined
 } from '@ant-design/icons'
 import appApi from '../api/appApi'
 import * as routes from '../api/apiRoutes'
 import useModal from '../utils/useModal'
-import FormProfile from '../components/FormProfile'
 import { useSelector } from 'react-redux'
 import FormChangeRole from '../components/FormChangeRole'
+import FormChangeStatus from '../components/FormChangeStatus'
+import FormAddStaff from '../components/FormAddStaff'
 
 let result = []
 const Staff = () => {
   const searchInput = useRef(null)
 
   const [staffs, setStaffs] = useState([])
+  const [restaurants,setRestaurants] = useState([])
   const [loading, setLoading] = useState(false)
   const [searchValues, setSearchValues] = useState({})
   const [input, setInput] = useState({})
   const [currItem, setCurrItem] = useState(null)
   const { isShowing, toggle } = useModal()
   const { currentUser } = useSelector(state => state.user)
-  const [isProfile, setModal] = useState(true)
+  const [isStatus, setModal] = useState(true)
 
   // Fetch staff data
   const fetchStaff = async () => {
@@ -38,19 +41,46 @@ const Staff = () => {
         }
       )
 
-      console.log(result.data)
+      result = result.data.staffs.map((staff, index) => ({
+        ...staff,
+        key: index
+      }))
+      // Sort result by id
+      result.sort((a, b) => a.id - b.id)
 
-      // result = result.data.promotions.map((staff, index) => ({
-      //   ...staff,
-      //   key: index
-      // }))
-      // // Sort result by id
-      // result.sort((a, b) => a.id - b.id)
-
-      // console.log(result)
-      // setStaffs(result)
+      console.log(result)
+      setStaffs(result)
     } catch (err) {
       console.log(err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchRestaurant = async () => {
+    try {
+      let result = await appApi.get(
+        routes.GET_RESTAURANT,
+        routes.getRestaurantParams('ALL')
+      )
+      console.log(result.data)
+
+      result = result.data.restaurants.map((restaurant, index) => ({
+        id: restaurant.id,
+        resAddress:restaurant.resAddress,
+        key: index
+      }))
+      // Sort result by id
+      result.sort((a, b) => a.id - b.id)
+      setRestaurants(result)
+    } catch (err) {
+      if (err.response) {
+        console.log(err.response.data)
+        console.log(err.response.status)
+        console.log(err.response.headers)
+      } else {
+        console.log(err.message)
+      }
     } finally {
       setLoading(false)
     }
@@ -59,6 +89,7 @@ const Staff = () => {
   useEffect(() => {
     setLoading(true)
     fetchStaff()
+    fetchRestaurant()
   }, [])
 
   const sort = (a, b, key) => {
@@ -90,10 +121,10 @@ const Staff = () => {
     })
   }
 
-  const showModal = (id, isProfile) => {
+  const showModal = (id, modalID) => {
     toggle(true)
     setCurrItem(result.filter(r => r.id === id)[0])
-    setModal(isProfile)
+    setModal(modalID)
   }
 
   const handleCancel = () => {
@@ -195,35 +226,40 @@ const Staff = () => {
     }
   })
 
+  const reformatDate = date => {
+    const dates = date.split('-')
+    return dates[2] + '-' + dates[1] + '-' + dates[0]
+  }
+
+
   const columns = [
     {
       title: 'ID',
       dataIndex: 'id',
       key: 'id',
-      width: 30,
+      width: 8,
       sorter: (a, b) => sort(a, b, 'id'),
-      sortDirections: ['descend', 'ascend'],
-      render: (_, r) => <p className='font-medium'>{r.id}</p>
+      sortDirections: ['descend', 'ascend']
     },
     {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
-      width: 35,
+      width: 30,
       ...getColumnSearchProps('name', 'name'),
       sorter: (a, b) => sort(a, b, 'name'),
       sortDirections: ['descend', 'ascend'],
-      render: (_, r) => <p className=''>{r.name}</p>
+      render: (_, r) => <p className='font-medium'>{r.User.name}</p>
     },
     {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
-      width: 35,
+      width: 30,
       ...getColumnSearchProps('email', 'name'),
       sorter: (a, b) => sort(a, b, 'email'),
       sortDirections: ['descend', 'ascend'],
-      render: (_, r) => <p className=''>{r.email}</p>
+      render: (_, r) => <p className=''>{r.User.email}</p>
     },
 
     {
@@ -234,25 +270,41 @@ const Staff = () => {
       ...getColumnSearchProps('phoneNumber'),
       sorter: (a, b) => sort(a, b, 'phoneNumber'),
       sortDirections: ['descend', 'ascend'],
-      className: ''
+      render: (_, r) => <p className=''>{r.User.phoneNumber}</p>
     },
     {
-      title: 'Role',
-      key: 'roleValue',
+      title: 'Restaurant',
+      dataIndex: 'name',
+      key: 'name',
+      width: 35,
+      ...getColumnSearchProps('name', 'name'),
+      sorter: (a, b) => sort(a, b, 'name'),
+      sortDirections: ['descend', 'ascend'],
+      render: (_, r) => <p className=''>{r.Restaurant.resAddress}</p>
+    },
+    {
+      title: 'Status',
+      key: 'statusValue',
       width: 16,
-      sorter: (a, b) => sort(a, b, 'roleValue'),
+      sorter: (a, b) => sort(a, b, 'statusValue'),
       sortDirections: ['descend', 'ascend'],
       render: (_, r) => {
-        switch (r.roleValue) {
-          case 'Customer':
-            return <Tag color='green'>Customer</Tag> //#87d068
-          case 'Staff':
-            return <Tag color='yellow'>Staff</Tag>
-          case 'Admin':
-            return <Tag color='red'>Admin</Tag>
+        switch (r.staffStatus) {
+          case 1:
+            return <Tag color='green'>{r.staffstatusData.value}</Tag> //#87d068
           default:
+            return <Tag color='red'>{r.staffstatusData.value}</Tag>
         }
       }
+    },
+    {
+      title: 'Working day',
+      key: 'workingDay',
+      width: 20,
+      ...getColumnSearchProps('date', null),
+      sorter: (a, b) => sort(a, b, 'date'),
+      sortDirections: ['descend', 'ascend'],
+      render: (_, r) => <p>{reformatDate(r.workingDay.substring(0, 10))}</p>
     },
     {
       title: 'Action',
@@ -261,18 +313,18 @@ const Staff = () => {
       width: 18,
       render: (_, r) => (
         <div className='flex gap-4'>
-          <Tooltip title='Profile'>
+          <Tooltip title='Change role'>
             <Button
-              onClick={() => showModal(r.id, true)}
+              onClick={() => showModal(r.id, 0)}
               icon={<UserOutlined />}
               type='primary'
               className='bg-blue-button'
             />
           </Tooltip>
 
-          <Tooltip title='Change role'>
+          <Tooltip title='Update status'>
             <Button
-              onClick={() => showModal(r.id, false)}
+              onClick={() => showModal(r.id, 1)}
               danger
               icon={<EditOutlined />}
               type='primary'
@@ -284,17 +336,31 @@ const Staff = () => {
     }
   ]
 
+  const addStaff = () => {
+    toggle(true)
+    setCurrItem(null)
+    setModal(2)
+  }
+
   return (
     <React.Fragment>
       <h1 className='flex items-center justify-between mb-4'>
         <strong className='text-xl'>Staff list</strong>
         <div className='flex gap-2'>
+          <Button
+            type='primary'
+            className='bg-blue-button flex items-center justify-center'
+            onClick={() => addStaff()}
+          >
+            <PlusCircleOutlined />
+            Add
+          </Button>
           <Button onClick={() => clearFilters()} className='text-black'>
             Clear Filters
           </Button>
         </div>
       </h1>
-      {/*loading?<Spin/>:
+      {loading?<Spin/>:
       <Table
         columns={columns}
         dataSource={staffs}
@@ -303,21 +369,34 @@ const Staff = () => {
           x: 1000
         }}
       />
-      */}
-      <FormProfile
-        title={'Profile'}
-        isShowing={isShowing && isProfile}
-        onCancel={handleCancel}
-        initial={currItem}
-        setInitial={setCurrItem}
-      />
+      }
       <FormChangeRole
         title={'Edit role'}
-        isShowing={isShowing && !isProfile}
+        isShowing={isShowing && isStatus===0}
         onCancel={handleCancel}
         onCreate={handleSave}
         initial={currItem}
         setInitial={setCurrItem}
+        fetchStaff={fetchStaff}
+      />
+      <FormChangeStatus
+        title={'Update staff status'}
+        isShowing={isShowing && isStatus===1}
+        onCancel={handleCancel}
+        onCreate={handleSave}
+        initial={currItem}
+        setInitial={setCurrItem}
+        fetchStaff={fetchStaff}
+      />
+      <FormAddStaff
+        title={'Add new staff'}
+        isShowing={isShowing && isStatus===2}
+        onCancel={handleCancel}
+        onCreate={handleSave}
+        initial={currItem}
+        setInitial={setCurrItem}
+        fetchStaff={fetchStaff}
+        restaurants={restaurants}
       />
     </React.Fragment>
   )
