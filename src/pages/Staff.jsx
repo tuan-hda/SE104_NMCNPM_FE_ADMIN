@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Table, Input, Button, Space, Tooltip, Tag } from 'antd'
+import { Table, Input, Button, Space, Tooltip, Tag,Spin } from 'antd'
 import {
   SearchOutlined,
   EditOutlined,
@@ -13,10 +13,10 @@ import { useSelector } from 'react-redux'
 import FormChangeRole from '../components/FormChangeRole'
 
 let result = []
-const User = () => {
+const Staff = () => {
   const searchInput = useRef(null)
 
-  const [users, setUsers] = useState([])
+  const [staffs, setStaffs] = useState([])
   const [loading, setLoading] = useState(false)
   const [searchValues, setSearchValues] = useState({})
   const [input, setInput] = useState({})
@@ -25,22 +25,30 @@ const User = () => {
   const { currentUser } = useSelector(state => state.user)
   const [isProfile, setModal] = useState(true)
 
-  // Fetch product data
-  const fetchUser = async () => {
+  // Fetch staff data
+  const fetchStaff = async () => {
     try {
       const token = await currentUser.getIdToken()
       result = await appApi.get(
-        routes.GET_ALL_USERS,
-        routes.getAccessTokenHeader(token)
+        routes.GET_STAFFS_LIST,
+        {
+          headers: {
+            Authorization: 'Bearer ' + token
+          }
+        }
       )
 
-      result = result.data.users.map((user, index) => ({
-        ...user,
-        roleValue: user.roleData.value,
-        key: index
-      }))
+      console.log(result.data)
 
-      setUsers(result)
+      // result = result.data.promotions.map((staff, index) => ({
+      //   ...staff,
+      //   key: index
+      // }))
+      // // Sort result by id
+      // result.sort((a, b) => a.id - b.id)
+
+      // console.log(result)
+      // setStaffs(result)
     } catch (err) {
       console.log(err)
     } finally {
@@ -50,7 +58,7 @@ const User = () => {
 
   useEffect(() => {
     setLoading(true)
-    fetchUser()
+    fetchStaff()
   }, [])
 
   const sort = (a, b, key) => {
@@ -68,7 +76,7 @@ const User = () => {
         return compareStr(item[k], searchValues[k])
       })
     })
-    setUsers(filteredResult)
+    setStaffs(filteredResult)
   }, [searchValues])
 
   const clearFilters = () => {
@@ -261,6 +269,16 @@ const User = () => {
               className='bg-blue-button'
             />
           </Tooltip>
+
+          <Tooltip title='Change role'>
+            <Button
+              onClick={() => showModal(r.id, false)}
+              danger
+              icon={<EditOutlined />}
+              type='primary'
+              hidden={r.roleValue==='Customer'}
+            />
+          </Tooltip>
         </div>
       )
     }
@@ -269,22 +287,23 @@ const User = () => {
   return (
     <React.Fragment>
       <h1 className='flex items-center justify-between mb-4'>
-        <strong className='text-xl'>User list</strong>
+        <strong className='text-xl'>Staff list</strong>
         <div className='flex gap-2'>
           <Button onClick={() => clearFilters()} className='text-black'>
             Clear Filters
           </Button>
         </div>
       </h1>
+      {/*loading?<Spin/>:
       <Table
         columns={columns}
-        dataSource={users}
+        dataSource={staffs}
         loading={loading}
         scroll={{
           x: 1000
         }}
       />
-
+      */}
       <FormProfile
         title={'Profile'}
         isShowing={isShowing && isProfile}
@@ -304,4 +323,4 @@ const User = () => {
   )
 }
 
-export default User
+export default Staff

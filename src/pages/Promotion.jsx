@@ -40,6 +40,7 @@ const Promotion = () => {
       // Sort result by id
       result.sort((a, b) => a.id - b.id)
 
+      console.log(result)
       setPromotion(result)
     } catch (err) {
       console.log(err)

@@ -154,3 +154,14 @@ export const getUpdatePromotionBody = (id,name,begin,end,banner,value) => ({
   banner,
   value
 })
+
+// GET STAFFS LIST
+export const GET_STAFFS_LIST = 'get-staff'
+export const getStaffListConfig = (token,id) => ({
+  headers: {
+    Authorization: 'Bearer ' + token
+  },
+  params: {
+    id: id
+  }
+})

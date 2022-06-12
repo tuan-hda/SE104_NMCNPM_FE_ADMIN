@@ -8,16 +8,6 @@ import moment from 'moment'
 import { type } from '@testing-library/user-event/dist/type'
 const { Option } = Select
 
-const categories = [
-  'Combos',
-  'Hamburger',
-  'Chicken',
-  'Rice',
-  'Sides',
-  'Desserts',
-  'Drinks'
-]
-
 const FormPromotionModify = ({
   isShowing,
   onCreate,
@@ -28,7 +18,7 @@ const FormPromotionModify = ({
 }) => {
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
-  const [imgUrl, setImgUrl] = useState(initial?.itemImage)
+  const [imgUrl, setImgUrl] = useState(initial?.banner)
   const { currentUser } = useSelector(state => state.user)
 
   const clearFields = () => {
@@ -139,6 +129,7 @@ const FormPromotionModify = ({
     form.resetFields()
     setImgUrl(initial?.itemImage)
   }, [initial, form])
+  
 
   const uploadButton = (
     <div>
@@ -238,7 +229,7 @@ const FormPromotionModify = ({
         </Form.Item>
         {/* Image */}
         {/* Upload image here. Since it's an asynchronous behaviour,  we need to implement some state handling here */}
-        <Form.Item name='image' label='Image' initialValue={initial?.banner}>
+        <Form.Item name='banner' label='Banner' initialValue={initial?.banner}>
           <Upload
             listType='picture-card'
             className='avatar-uploader'
