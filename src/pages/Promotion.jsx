@@ -32,14 +32,15 @@ const Promotion = () => {
     try {
       const token = await currentUser.getIdToken()
       result = await appApi.get(routes.GET_ALL_PROMOTION, routes.getPromotionConfig(token,'ALL'))
-
-      console.log(result.data)
-      const promotions = result.data.promotions
-
+      
+      result = result.data.promotions.map((promotion, index) => ({
+        ...promotion,
+        key: index
+      }))
       // Sort result by id
-      promotions.sort((a, b) => a.id - b.id)
+      result.sort((a, b) => a.id - b.id)
 
-      setPromotion(promotions)
+      setPromotion(result)
     } catch (err) {
       console.log(err)
     } finally {

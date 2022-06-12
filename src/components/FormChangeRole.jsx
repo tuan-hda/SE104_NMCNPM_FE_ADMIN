@@ -93,6 +93,7 @@ const FormChangeRole = ({
       }}
       okType='primary'
       centered
+      forceRender
     >
       <Form
         form={form}

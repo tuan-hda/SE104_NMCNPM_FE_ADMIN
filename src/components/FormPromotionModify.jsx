@@ -5,6 +5,7 @@ import appApi from '../api/appApi'
 import * as routes from '../api/apiRoutes'
 import { useSelector } from 'react-redux'
 import moment from 'moment'
+import { type } from '@testing-library/user-event/dist/type'
 const { Option } = Select
 
 const categories = [
@@ -26,9 +27,6 @@ const FormPromotionModify = ({
   fetchPromotion
 }) => {
   const [form] = Form.useForm()
-  const featured = Form.useWatch('featured', form)
-  const available = Form.useWatch('available', form)
-  // const available = Form.useWatch('available', form)
   const [loading, setLoading] = useState(false)
   const [imgUrl, setImgUrl] = useState(initial?.itemImage)
   const { currentUser } = useSelector(state => state.user)
@@ -45,54 +43,40 @@ const FormPromotionModify = ({
   }
 
   const addItem = async values => {
-    try {
-      const token = await currentUser.getIdToken()
-      await appApi.post(
-        routes.ADD_PROMOTION,
-        routes.getAddPromotionBody(
-          values.name,
-          values.begin,
-          values.end,
-          values.value,
-          values.banner
-        ),
-        routes.getAccessTokenHeader(token)
-      )
+    console.log(values.banner)
+    // try {
+    //   const token = await currentUser.getIdToken()
+    //   await appApi.post(
+    //     routes.ADD_PROMOTION,
+    //     routes.getAddPromotionBody(
+    //       values.name,
+    //       values.begin.toDate(),
+    //       values.end.toDate(),
+    //       values.value,
+    //       values.banner
+    //     ),
+    //     routes.getAccessTokenHeader(token)
+    //   )
 
-      await fetchPromotion()
-      console.log('Success')
-    } catch (err) {
-      console.log(err)
-    }
+    //   await fetchPromotion()
+    //   console.log('Success')
+    // } catch (err) {
+    //   console.log(err)
+    // }
   }
 
   const updateItem = async values => {
     try {
       const token = await currentUser.getIdToken()
-      console.log(
-        'Update item: ',
-        routes.getUpdateItemBody(
-          initial.id,
-          values.name,
-          values.category,
-          values.image,
-          values.price,
-          values.calories,
-          values.featured,
-          values.available
-        )
-      )
       await appApi.put(
-        routes.UPDATE_ITEM,
-        routes.getUpdateItemBody(
+        routes.UPDATE_PROMOTION,
+        routes.getUpdatePromotionBody(
           initial.id,
           values.name,
-          values.category,
-          values.image,
-          values.price,
-          values.calories,
-          values.featured,
-          values.available
+          values.begin,
+          values.end,
+          values.banner,
+          values.value
         ),
         routes.getAccessTokenHeader(token)
       )
@@ -179,6 +163,7 @@ const FormPromotionModify = ({
         className: 'bg-blue-button'
       }}
       okType='primary'
+      forceRender
     >
       <Form
         form={form}
@@ -193,7 +178,7 @@ const FormPromotionModify = ({
         <Form.Item
           name='name'
           label='Name'
-          initialValue={initial?.itemName}
+          initialValue={initial?.promotionName}
           rules={[
             {
               required: true,
@@ -208,7 +193,7 @@ const FormPromotionModify = ({
         <Form.Item
           name='value'
           label='Value (%)'
-          initialValue={initial?.value.substring(2)}
+          initialValue={initial?.value}
           rules={[
             {
               required: true,
@@ -226,21 +211,34 @@ const FormPromotionModify = ({
         <Form.Item
           name='begin'
           label='Begin'
-          initialValue={initial?.begin}
+          initialValue={moment({hour:0,minute:0})}
+          rules={[
+            {
+              type: 'object'
+            }
+          ]}
         >
-            <DatePicker showTime format={'DD/MM/YYYY HH:mm'} defaultValue={moment({hour:0,minute:0})}/>
+            <DatePicker 
+              showTime
+              format={'DD/MM/YYYY HH:mm'} 
+              />
         </Form.Item>
         {/* End */}
         <Form.Item
           name='end'
           label='End'
-          initialValue={initial?.end}
+          initialValue={moment({hour:0,minute:0}).add(1,'days')}
+          rules={[
+            {
+              type: 'object'
+            }
+          ]}
         >
-            <DatePicker showTime format={'DD/MM/YYYY HH:mm'} defaultValue={moment({hour:0,minute:0}).add(1,'days')}/>
+            <DatePicker showTime format={'DD/MM/YYYY HH:mm'}/>
         </Form.Item>
         {/* Image */}
         {/* Upload image here. Since it's an asynchronous behaviour,  we need to implement some state handling here */}
-        <Form.Item name='image' label='Image' initialValue={initial?.itemImage}>
+        <Form.Item name='image' label='Image' initialValue={initial?.banner}>
           <Upload
             listType='picture-card'
             className='avatar-uploader'

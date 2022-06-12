@@ -143,3 +143,14 @@ export const getAddPromotionBody = (promotionName,begin,end,value,banner) => ({
   value,
   banner
 })
+
+// UPDATE PROMOTION
+export const UPDATE_PROMOTION = 'update-promotion'
+export const getUpdatePromotionBody = (id,name,begin,end,banner,value) => ({
+  id,
+  name,
+  begin,
+  end,
+  banner,
+  value
+})
