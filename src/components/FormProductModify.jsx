@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { Form, Input, Upload, Select, Switch, message, Modal, Tag } from 'antd'
+import { Form, Input, Upload, Select, Switch, message, Modal } from 'antd'
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons'
 import appApi from '../api/appApi'
 import * as routes from '../api/apiRoutes'
 import { useSelector } from 'react-redux'
+import { v4 } from 'uuid'
+import { storage } from '../firebase'
+import { useRef } from 'react'
 const { Option } = Select
 
 const categories = [
@@ -31,9 +34,10 @@ const FormProductModify = ({
   const [loading, setLoading] = useState(false)
   const [imgUrl, setImgUrl] = useState(initial?.itemImage)
   const { currentUser } = useSelector(state => state.user)
+  const initialImage = useRef()
 
   const clearFields = () => {
-    setImgUrl(false)
+    setImgUrl('')
     setLoading(false)
   }
 
@@ -43,7 +47,7 @@ const FormProductModify = ({
     form.resetFields()
   }
 
-  const addItem = async values => {
+  const addItem = async (values, url) => {
     try {
       const token = await currentUser.getIdToken()
       console.log(
@@ -51,8 +55,8 @@ const FormProductModify = ({
         routes.getAddItemBody(
           values.name,
           values.category,
-          values.image,
-          values.price,
+          url ? url : values.image,
+          parseInt(values.price),
           values.calories,
           values.featured,
           values.available
@@ -63,8 +67,8 @@ const FormProductModify = ({
         routes.getAddItemBody(
           values.name,
           values.category,
-          values.image,
-          values.price,
+          url ? url : values.image,
+          parseInt(values.price),
           values.calories,
           values.featured,
           values.available
@@ -72,14 +76,14 @@ const FormProductModify = ({
         routes.getAccessTokenHeader(token)
       )
 
-      await fetchProduct()
+      // fetchProduct()
       console.log('Success')
     } catch (err) {
       console.log(err)
     }
   }
 
-  const updateItem = async values => {
+  const updateItem = async (values, url) => {
     try {
       const token = await currentUser.getIdToken()
       console.log(
@@ -88,7 +92,7 @@ const FormProductModify = ({
           initial.id,
           values.name,
           values.category,
-          values.image,
+          url ? url : values.image,
           values.price,
           values.calories,
           values.featured,
@@ -101,7 +105,7 @@ const FormProductModify = ({
           initial.id,
           values.name,
           values.category,
-          values.image,
+          url ? url : values.image,
           values.price,
           values.calories,
           values.featured,
@@ -110,7 +114,7 @@ const FormProductModify = ({
         routes.getAccessTokenHeader(token)
       )
 
-      await fetchProduct()
+      fetchProduct()
       console.log('Success')
     } catch (err) {
       console.log(err)
@@ -118,8 +122,14 @@ const FormProductModify = ({
   }
 
   const handleResult = values => {
-    if (!initial) addItem(values)
-    else updateItem(values)
+    if (!initial) {
+      if (!values.image) addItem(values)
+      else handleUploadImage(values, values.image, addItem)
+    } else {
+      // If image doesn't change, dont upload it to Firebase storage
+      if (initialImage.current === imgUrl) updateItem(values)
+      else handleUploadImage(values, values.image, updateItem)
+    }
   }
 
   const onOk = () => {
@@ -134,6 +144,31 @@ const FormProductModify = ({
       .catch(info => {
         console.log('Validate failed: ' + info)
       })
+  }
+
+  const handleUploadImage = (values, image, callback) => {
+    // Generate a random id to make sure images' name are not duplicate
+    const imageName = v4()
+    // Get extension of image (jpg/png)
+    const imageExt = image.file.name.split('.').pop()
+    const name = imageName + '.' + imageExt
+    const task = storage.ref(`products/${name}`).put(image.file.originFileObj)
+    task.on(
+      'state_changed',
+      snapshot => {},
+      error => {
+        console.log(error)
+      },
+      () => {
+        storage
+          .ref('products')
+          .child(name)
+          .getDownloadURL()
+          .then(url => {
+            callback(values, url)
+          })
+      }
+    )
   }
 
   const handleUpload = info => {
@@ -166,6 +201,7 @@ const FormProductModify = ({
 
   useEffect(() => {
     form.resetFields()
+    initialImage.current = initial?.itemImage
     setImgUrl(initial?.itemImage)
   }, [initial, form])
 
@@ -286,7 +322,7 @@ const FormProductModify = ({
         <Form.Item
           name='available'
           label='Available'
-          initialValue={initial ? initial.available : false}
+          initialValue={initial ? initial.available : true}
         >
           <Switch
             className={`${available ? 'bg-blue-button' : 'bg-gray-200'}`}
