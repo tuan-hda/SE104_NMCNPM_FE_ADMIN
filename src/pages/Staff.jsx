@@ -307,6 +307,22 @@ const Staff = () => {
       render: (_, r) => <p>{reformatDate(r.workingDay.substring(0, 10))}</p>
     },
     {
+      title: 'Role',
+      key: 'roleValue',
+      width: 16,
+      sorter: (a, b) => sort(a, b, 'roleValue'),
+      sortDirections: ['descend', 'ascend'],
+      render: (_, r) => {
+        switch (r.User.roleID) {
+          case 0:
+            return <Tag color='red'>{r.User.roleData.value}</Tag>
+          case 1:
+            return <Tag color='yellow'>{r.User.roleData.value}</Tag>
+          default:
+        }
+      }
+    },
+    {
       title: 'Action',
       key: 'operation',
       fixed: 'right',

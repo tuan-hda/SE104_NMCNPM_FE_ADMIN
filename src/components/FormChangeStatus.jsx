@@ -38,6 +38,8 @@ const FormChangeStatus = ({
   }
 
   const changeStatus = async values => {
+    // const token = await currentUser.getIdToken()  
+    // console.log(routes.getStaffStatusConfig(token,initial?.id,convertToStaffStatus(values.status)))
     try {
       const token = await currentUser.getIdToken()
       await appApi.put(
