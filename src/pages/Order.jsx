@@ -381,14 +381,16 @@ const Orders = ({ initial }) => {
     },
     Table.EXPAND_COLUMN,
     {
-      title: 'Action',
+      title: !initial && 'Action',
       key: 'operation',
       fixed: 'right',
-      width: 10,
+      width: initial ? 1 : 10,
       render: (_, r, i) => {
         // If this order was delivered successfully, no action is allowed
         if (!option && pendingOrders[i].billstatus >= 3) return
         if (option && orders[i].billstatus >= 3) return
+
+        if (initial) return
 
         // if option return true, that mean this function is called to generate columns for non-pending orders (its status maybe in progress, delivered or canceled)
         if (option) {
