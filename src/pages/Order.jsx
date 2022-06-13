@@ -36,9 +36,12 @@ const Orders = ({ initial }) => {
       rest = []
 
       let result = await appApi.get(
+        // routes.GET_ALL_EXISTED_ORDERS,
         initial ? routes.GET_ALL_EXISTED_ORDERS : routes.GET_RESTAURANT_ORDERS,
         routes.getAccessTokenHeader(token)
       )
+
+      console.log(result)
 
       result = result.data.orders.map((res, index) => ({
         ...res,
@@ -80,7 +83,6 @@ const Orders = ({ initial }) => {
 
   useEffect(() => {
     fetchOrders()
-
     let timer = setInterval(() => {
       fetchOrders()
     }, 60000)

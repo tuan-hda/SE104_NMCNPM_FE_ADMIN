@@ -50,16 +50,14 @@ export const getAddItemBody = (
   itemImage,
   price,
   calories,
-  featured,
-  available
+  featured
 ) => ({
   itemName,
   type: convertCategoryToInt(type),
   itemImage,
   price,
   calories,
-  featured,
-  available
+  featured
 })
 
 // UPDATE ITEM
@@ -84,6 +82,12 @@ export const getUpdateItemBody = (
   available
 })
 
+// DELETE ITEM
+export const DELETE_ITEM = 'delete-item'
+export const getIdParams = id => ({
+  params: { id }
+})
+
 export const GET_RESTAURANT_ORDERS = 'display-order'
 export const getRestaurantOrdersParams = id => ({
   params: { id }
@@ -94,7 +98,7 @@ export const GET_ALL_USERS = 'get-all-users'
 
 // CHANGE ROLE
 export const CHANGE_ROLE = 'change-role'
-export const getChangeRoleConfig = (token,id,roleID) => ({
+export const getChangeRoleConfig = (token, id, roleID) => ({
   headers: {
     Authorization: 'Bearer ' + token
   },
@@ -132,7 +136,7 @@ export const GET_ALL_EXISTED_ORDERS = 'get-all-existed-orders'
 
 // GET ALL PROMOTION
 export const GET_ALL_PROMOTION = 'get-promotion'
-export const getPromotionConfig = (token,id) => ({
+export const getPromotionConfig = (token, id) => ({
   headers: {
     Authorization: 'Bearer ' + token
   },
@@ -143,7 +147,13 @@ export const getPromotionConfig = (token,id) => ({
 
 // ADD PROMOTION
 export const ADD_PROMOTION = 'add-promotion'
-export const getAddPromotionBody = (promotionName,begin,end,value,banner) => ({
+export const getAddPromotionBody = (
+  promotionName,
+  begin,
+  end,
+  value,
+  banner
+) => ({
   promotionName,
   begin,
   end,
@@ -153,7 +163,14 @@ export const getAddPromotionBody = (promotionName,begin,end,value,banner) => ({
 
 // UPDATE PROMOTION
 export const UPDATE_PROMOTION = 'update-promotion'
-export const getUpdatePromotionBody = (id,name,begin,end,banner,value) => ({
+export const getUpdatePromotionBody = (
+  id,
+  name,
+  begin,
+  end,
+  banner,
+  value
+) => ({
   id,
   name,
   begin,
@@ -164,7 +181,7 @@ export const getUpdatePromotionBody = (id,name,begin,end,banner,value) => ({
 
 // GET STAFFS LIST
 export const GET_STAFFS_LIST = 'get-staff'
-export const getStaffListConfig = (token,id) => ({
+export const getStaffListConfig = (token, id) => ({
   headers: {
     Authorization: 'Bearer ' + token
   },
@@ -175,7 +192,7 @@ export const getStaffListConfig = (token,id) => ({
 
 // UPDATE STAFF STATUS
 export const UPDATE_STAFF_STATUS = 'update-staff-status'
-export const getStaffStatusConfig = (token,id,staffStatus) => ({
+export const getStaffStatusConfig = (token, id, staffStatus) => ({
   headers: {
     Authorization: 'Bearer ' + token
   },
@@ -189,10 +206,7 @@ export const getStaffStatusConfig = (token,id,staffStatus) => ({
 
 // ADD STAFF
 export const ADD_STAFF = 'add-new-staff'
-export const getAddStaffBody = (
-  email,
-  restaurantID
-) => ({
+export const getAddStaffBody = (email, restaurantID) => ({
   email,
   restaurantID
 })
@@ -204,4 +218,3 @@ export const getRestaurantParams = id => ({
     id: id
   }
 })
-

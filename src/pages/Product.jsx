@@ -233,35 +233,13 @@ const Product = () => {
 
   const deleteItem = async id => {
     try {
-      console.log(
-        'Delete item (use update): ',
-        routes.getUpdateItemBody(
-          id,
-          product[id].itemName,
-          product[id].typeValue,
-          product[id].itemImage,
-          product[id].price.substring(2),
-          product[id].calories,
-          product[id].featured,
-          0
-        )
-      )
+      console.log('Delete item: ', routes.getIdParams(id))
       const token = await currentUser.getIdToken()
-      await appApi.put(
-        routes.UPDATE_ITEM,
-        routes.getUpdateItemBody(
-          id,
-          product[id].itemName,
-          product[id].typeValue,
-          product[id].itemImage,
-          product[id].price.substring(2),
-          product[id].calories,
-          product[id].featured,
-          0
-        ),
-        routes.getAccessTokenHeader(token)
-      )
-      await fetchProduct()
+      await appApi.put(routes.DELETE_ITEM, null, {
+        ...routes.getAccessTokenHeader(token),
+        ...routes.getIdParams(id)
+      })
+      fetchProduct()
       console.log('Success')
     } catch (err) {
       console.log(err)

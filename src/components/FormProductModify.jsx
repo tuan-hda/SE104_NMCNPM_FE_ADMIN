@@ -58,8 +58,7 @@ const FormProductModify = ({
           url ? url : values.image,
           parseInt(values.price),
           values.calories,
-          values.featured ? 1 : 0,
-          values.available ? 1 : 0
+          values.featured ? 1 : 0
         )
       )
       await appApi.post(
@@ -70,13 +69,12 @@ const FormProductModify = ({
           url ? url : values.image,
           parseInt(values.price),
           values.calories,
-          values.featured ? 1 : 0,
-          values.available ? 1 : 0
+          values.featured ? 1 : 0
         ),
         routes.getAccessTokenHeader(token)
       )
 
-      // fetchProduct()
+      fetchProduct()
       console.log('Success')
     } catch (err) {
       console.log(err)
@@ -319,16 +317,18 @@ const FormProductModify = ({
         </Form.Item>
 
         {/* Available */}
-        <Form.Item
-          name='available'
-          label='Available'
-          initialValue={initial ? initial.available : true}
-        >
-          <Switch
-            className={`${available ? 'bg-blue-button' : 'bg-gray-200'}`}
-            checked={available}
-          />
-        </Form.Item>
+        {initial && (
+          <Form.Item
+            name='available'
+            label='Available'
+            initialValue={initial ? initial.available : true}
+          >
+            <Switch
+              className={`${available ? 'bg-blue-button' : 'bg-gray-200'}`}
+              checked={available}
+            />
+          </Form.Item>
+        )}
 
         {/* Available 
         <Form.Item label='Available'>
