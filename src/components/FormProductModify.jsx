@@ -58,8 +58,8 @@ const FormProductModify = ({
           url ? url : values.image,
           parseInt(values.price),
           values.calories,
-          values.featured,
-          values.available
+          values.featured ? 1 : 0,
+          values.available ? 1 : 0
         )
       )
       await appApi.post(
@@ -70,8 +70,8 @@ const FormProductModify = ({
           url ? url : values.image,
           parseInt(values.price),
           values.calories,
-          values.featured,
-          values.available
+          values.featured ? 1 : 0,
+          values.available ? 1 : 0
         ),
         routes.getAccessTokenHeader(token)
       )
@@ -95,8 +95,8 @@ const FormProductModify = ({
           url ? url : values.image,
           values.price,
           values.calories,
-          values.featured,
-          values.available
+          values.featured ? 1 : 0,
+          values.available ? 1 : 0
         )
       )
       await appApi.put(
