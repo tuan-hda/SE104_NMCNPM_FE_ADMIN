@@ -98,17 +98,11 @@ export const GET_ALL_USERS = 'get-all-users'
 
 // CHANGE ROLE
 export const CHANGE_ROLE = 'change-role'
-export const getChangeRoleConfig = (token, id, roleID) => ({
-  headers: {
-    Authorization: 'Bearer ' + token  
-  },
-  params: {
-    id: id
-  },
-  data: {
-    roleID: roleID
-  }
+export const getChangeRoleBody = ( id,roleID) => ({
+  id,
+  roleID
 })
+
 
 export const SIGN_UP = 'create-new-user'
 export const getSignupBody = (email, name) => ({
@@ -192,15 +186,15 @@ export const getStaffListConfig = (token, id) => ({
 
 // UPDATE STAFF STATUS
 export const UPDATE_STAFF_STATUS = 'update-staff-status'
-export const getStaffStatusConfig = (token, id, staffStatus) => ({
+export const getStaffStatusBody = ( staffStatus ) => ({
+  staffStatus
+})
+export const getUpdateStatusHeader = (token,id) => ({
   headers: {
     Authorization: 'Bearer ' + token
   },
   params: {
-    id: id
-  },
-  data: {
-    staffStatus: staffStatus
+    id
   }
 })
 

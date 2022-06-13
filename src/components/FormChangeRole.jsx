@@ -31,11 +31,11 @@ const FormChangeRole = ({
   const convertToRoleID = (roleValue) => {
       switch (roleValue) {
         case 'Admin':
-            return 0;
+            return '0';
         case 'Staff':
-            return 1;
+            return '1';
         default:
-            return 2;
+            return '2';
       } 
   }
 
@@ -49,14 +49,12 @@ const FormChangeRole = ({
     // ))
     try {
       const token = await currentUser.getIdToken()
-      await appApi.put(
+      const result = await appApi.put(
         routes.CHANGE_ROLE,
-        routes.getChangeRoleConfig(
-          token,
-          initial.id,
-          convertToRoleID(values.role)
-        )
+        routes.getChangeRoleBody(initial.userID,convertToRoleID(values.role)),
+        routes.getAccessTokenHeader(token)
       )
+      console.log(result)
       await fetchStaff()
       console.log('Success')
     } catch (err) {
