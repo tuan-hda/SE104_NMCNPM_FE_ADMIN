@@ -18,7 +18,7 @@ const FormChangeRole = ({
   onCancel,
   title,
   initial,
-  fetchStaff
+  fetchStaff,
 }) => {
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
@@ -31,15 +31,22 @@ const FormChangeRole = ({
   const convertToRoleID = (roleValue) => {
       switch (roleValue) {
         case 'Admin':
-            return '0';
+            return 0;
         case 'Staff':
-            return '1';
+            return 1;
         default:
-            return '2';
+            return 2;
       } 
   }
 
   const changeRole = async values => {
+    //const token = await currentUser.getIdToken()
+    // console.log(routes.getAccessTokenHeader(token))
+    // console.log(routes.getChangeRoleConfig(
+    //   token,
+    //   initial.id,
+    //   convertToRoleID(values.role)
+    // ))
     try {
       const token = await currentUser.getIdToken()
       await appApi.put(
@@ -95,7 +102,6 @@ const FormChangeRole = ({
       }}
       okType='primary'
       centered
-      forceRender
     >
       <Form
         form={form}
@@ -103,11 +109,11 @@ const FormChangeRole = ({
         labelAlign='left'
         labelCol={{ span: 6 }}  
       >
-        {/* Category */}
+        {/* Role */}
         <Form.Item
           name='role'
           label='Role'
-          initialValue='Staff'
+          initialValue={initial ? initial.User.roleData.value : roles[0]}
         >
           <Select>
             {roles.map((c, i) => (

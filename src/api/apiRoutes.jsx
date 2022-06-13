@@ -96,7 +96,7 @@ export const GET_ALL_USERS = 'get-all-users'
 export const CHANGE_ROLE = 'change-role'
 export const getChangeRoleConfig = (token,id,roleID) => ({
   headers: {
-    Authorization: 'Bearer ' + token
+    Authorization: 'Bearer ' + token  
   },
   params: {
     id: id

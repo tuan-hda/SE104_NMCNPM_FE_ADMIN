@@ -120,7 +120,7 @@ const FormProductModify = ({
         <Form.Item
           name='restaurant'
           label='Restaurant'
-          initialValue={initial ? initial.typeData.value : addresses[0]}
+          initialValue={addresses[0]}
         >
           <Select>
             {addresses.map((c, i) => (
