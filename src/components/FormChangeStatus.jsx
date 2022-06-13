@@ -7,12 +7,12 @@ import * as routes from '../api/apiRoutes'
 
 const { Option } = Select
 
-const roles = [
-    'Admin',
-    'Staff'
+const status = [
+    'Working',
+    'Retired'
   ]
 
-const FormChangeRole = ({
+const FormChangeStatus = ({
   isShowing,
   onCreate,
   onCancel,
@@ -28,27 +28,21 @@ const FormChangeRole = ({
     setLoading(false)
   }
 
-  const convertToRoleID = (roleValue) => {
-      switch (roleValue) {
-        case 'Admin':
-            return '0';
-        case 'Staff':
-            return '1';
+  const convertToStaffStatus = (statusValue) => {
+      switch (statusValue) {
+        case 'Working':
+            return 1;
         default:
-            return '2';
-      } 
+            return 0;
+      }
   }
 
-  const changeRole = async values => {
+  const changeStatus = async values => {
     try {
       const token = await currentUser.getIdToken()
       await appApi.put(
-        routes.CHANGE_ROLE,
-        routes.getChangeRoleConfig(
-          token,
-          initial.id,
-          convertToRoleID(values.role)
-        )
+        routes.UPDATE_STAFF_STATUS,
+        routes.getStaffStatusConfig(token,initial?.id,convertToStaffStatus(values.status))
       )
       await fetchStaff()
       console.log('Success')
@@ -71,7 +65,7 @@ const FormChangeRole = ({
         form.resetFields()
         onCreate(values)
         console.log(values)
-        changeRole(values)
+        changeStatus(values)
         clearFields()
       })
       .catch(info => {
@@ -105,12 +99,12 @@ const FormChangeRole = ({
       >
         {/* Category */}
         <Form.Item
-          name='role'
-          label='Role'
-          initialValue='Staff'
+          name='status'
+          label='Status'
+          initialValue={initial ? initial.staffstatusData.value : status[0]}
         >
           <Select>
-            {roles.map((c, i) => (
+            {status.map((c, i) => (
               <Option value={c} key={i}>
                 {c}
               </Option>
@@ -122,4 +116,4 @@ const FormChangeRole = ({
   )
 }
 
-export default FormChangeRole
+export default FormChangeStatus

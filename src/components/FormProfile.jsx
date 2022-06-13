@@ -42,6 +42,7 @@ const FormProfile = ({
       }}
       okType='primary'
       centered
+      forceRender
     >
     <div className='flex justify-center mb-8'>
       <Avatar
@@ -68,7 +69,6 @@ const FormProfile = ({
       >
         {/* Name */}
         <Form.Item
-          name='name'
           label={ 
             <p style={{fontWeight: 'bold'}}>Name</p>
             }
@@ -77,7 +77,6 @@ const FormProfile = ({
         </Form.Item>
         {/* Role */}
         <Form.Item
-          name='role'
           label={ 
             <p style={{fontWeight: 'bold'}}>Role</p>
             }
@@ -86,7 +85,6 @@ const FormProfile = ({
         </Form.Item>
         {/* Email */}
         <Form.Item
-          name='email'
           label={ 
             <p style={{fontWeight: 'bold'}}>Email</p>
             }
@@ -95,7 +93,6 @@ const FormProfile = ({
         </Form.Item>
         {/* Phone number */}
         <Form.Item
-          name='phoneNumber'
           label={ 
             <p style={{fontWeight: 'bold'}}>Phone number</p>
             }
@@ -104,7 +101,6 @@ const FormProfile = ({
         </Form.Item>
         {/* Address */}
         <Form.Item
-          name='detail'
           label={ 
             <p style={{fontWeight: 'bold'}}>Address</p>
             }
@@ -113,7 +109,6 @@ const FormProfile = ({
         </Form.Item>
         {/* Gender */}
         <Form.Item
-          name='gender'
           label={ 
             <p style={{fontWeight: 'bold'}}>Gender</p>
             }
@@ -122,7 +117,6 @@ const FormProfile = ({
         </Form.Item>
         {/* Date of birth */}
         <Form.Item
-          name='dob'
           label={ 
             <p style={{fontWeight: 'bold'}}>Date of birth</p>
             }

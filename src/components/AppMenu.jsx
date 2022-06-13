@@ -4,7 +4,8 @@ import { Layout, Menu, Modal } from 'antd'
 import {
   AppstoreOutlined,
   LogoutOutlined,
-  UserOutlined
+  UserOutlined,
+  IdcardOutlined
 } from '@ant-design/icons'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
@@ -56,8 +57,9 @@ const AppMenu = () => {
     getItem('All Orders', '2', <GiFoodTruck />, () => redirectTo('all-orders')),
     getItem('Product', '3', <AppstoreOutlined />, () => redirectTo('product')),
     getItem('User', '4', <UserOutlined />, () => redirectTo('user')),
-    getItem('Promotion', '5', <TbDiscount2 />, () => redirectTo('promotion')),
-    getItem('Sign out', '6', <LogoutOutlined />, () => confirm(), {
+    getItem('Staff','5',<IdcardOutlined />,() => redirectTo('staff')),
+    getItem('Promotion', '6', <TbDiscount2 />, () => redirectTo('promotion')),
+    getItem('Sign out', '7', <LogoutOutlined />, () => confirm(), {
       backgroundColor: 'transparent'
     })
   ]
@@ -73,8 +75,10 @@ const AppMenu = () => {
         return ['3']
       case 'user':
         return ['4']
-      case 'promotion':
+      case 'staff':
         return ['5']
+      case 'promotion':
+        return ['6']
       default:
         return ['0']
     }

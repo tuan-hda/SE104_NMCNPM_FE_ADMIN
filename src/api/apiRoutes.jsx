@@ -94,12 +94,15 @@ export const GET_ALL_USERS = 'get-all-users'
 
 // CHANGE ROLE
 export const CHANGE_ROLE = 'change-role'
-export const getChangeRoleBody = roleID => ({
-  roleID: roleID
-})
-export const getChangeRoleParams = id => ({
+export const getChangeRoleConfig = (token,id,roleID) => ({
+  headers: {
+    Authorization: 'Bearer ' + token
+  },
   params: {
     id: id
+  },
+  data: {
+    roleID: roleID
   }
 })
 
@@ -126,3 +129,79 @@ export const CONFIRM_ORDER_DELIVERED = 'confirm-delivered'
 export const DISPLAY_ORDER_ITEM = 'display-order-items'
 
 export const GET_ALL_EXISTED_ORDERS = 'get-all-existed-orders'
+
+// GET ALL PROMOTION
+export const GET_ALL_PROMOTION = 'get-promotion'
+export const getPromotionConfig = (token,id) => ({
+  headers: {
+    Authorization: 'Bearer ' + token
+  },
+  params: {
+    id: id
+  }
+})
+
+// ADD PROMOTION
+export const ADD_PROMOTION = 'add-promotion'
+export const getAddPromotionBody = (promotionName,begin,end,value,banner) => ({
+  promotionName,
+  begin,
+  end,
+  value,
+  banner
+})
+
+// UPDATE PROMOTION
+export const UPDATE_PROMOTION = 'update-promotion'
+export const getUpdatePromotionBody = (id,name,begin,end,banner,value) => ({
+  id,
+  name,
+  begin,
+  end,
+  banner,
+  value
+})
+
+// GET STAFFS LIST
+export const GET_STAFFS_LIST = 'get-staff'
+export const getStaffListConfig = (token,id) => ({
+  headers: {
+    Authorization: 'Bearer ' + token
+  },
+  params: {
+    id: id
+  }
+})
+
+// UPDATE STAFF STATUS
+export const UPDATE_STAFF_STATUS = 'update-staff-status'
+export const getStaffStatusConfig = (token,id,staffStatus) => ({
+  headers: {
+    Authorization: 'Bearer ' + token
+  },
+  params: {
+    id: id
+  },
+  data: {
+    staffStatus: staffStatus
+  }
+})
+
+// ADD STAFF
+export const ADD_STAFF = 'add-new-staff'
+export const getAddStaffBody = (
+  email,
+  restaurantID
+) => ({
+  email,
+  restaurantID
+})
+
+// GET RESTAURANT
+export const GET_RESTAURANT = 'get-all-restaurants'
+export const getRestaurantParams = id => ({
+  params: {
+    id: id
+  }
+})
+
