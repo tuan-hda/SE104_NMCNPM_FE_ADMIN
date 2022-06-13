@@ -31,7 +31,7 @@ const ExpandOrderItem = ({ id, currentUser }) => {
   }
 
   const calculateTotal = items => {
-    if (!items) return
+    if (!items || !Array.isArray(items) || !items.length) return
     return items.reduce((prev, curr) => prev + curr.currentprice, 0)
   }
 

@@ -57,7 +57,7 @@ const AppMenu = () => {
     getItem('All Orders', '2', <GiFoodTruck />, () => redirectTo('all-orders')),
     getItem('Product', '3', <AppstoreOutlined />, () => redirectTo('product')),
     getItem('User', '4', <UserOutlined />, () => redirectTo('user')),
-    getItem('Staff','5',<IdcardOutlined />,() => redirectTo('staff')),
+    getItem('Staff', '5', <IdcardOutlined />, () => redirectTo('staff')),
     getItem('Promotion', '6', <TbDiscount2 />, () => redirectTo('promotion')),
     getItem('Sign out', '7', <LogoutOutlined />, () => confirm(), {
       backgroundColor: 'transparent'
