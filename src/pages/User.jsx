@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Table, Input, Button, Space, Tooltip, Tag } from 'antd'
 import {
   SearchOutlined,
-  EditOutlined,
   UserOutlined
 } from '@ant-design/icons'
 import appApi from '../api/appApi'
@@ -10,10 +9,17 @@ import * as routes from '../api/apiRoutes'
 import useModal from '../utils/useModal'
 import FormProfile from '../components/FormProfile'
 import { useSelector } from 'react-redux'
-import FormChangeRole from '../components/FormChangeRole'
+import NotFound from './NotFound'
 
 let result = []
 const User = () => {
+  const role = useSelector(state => state.role)
+
+  if (!role || role === 'staff') return <NotFound isChildComponent />
+  return <UserContainer/>
+}
+const UserContainer = () => {
+  
   const searchInput = useRef(null)
 
   const [users, setUsers] = useState([])
@@ -89,10 +95,6 @@ const User = () => {
   }
 
   const handleCancel = () => {
-    toggle(false)
-  }
-
-  const handleSave = () => {
     toggle(false)
   }
 
