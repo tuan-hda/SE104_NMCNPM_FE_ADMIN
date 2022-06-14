@@ -374,14 +374,16 @@ const Product = () => {
       <h1 className='flex items-center justify-between mb-4'>
         <strong className='text-xl'>Item List</strong>
         <div className='flex gap-2'>
-          <Button
-            type='primary'
-            className='bg-blue-button flex items-center justify-center'
-            onClick={() => addProduct()}
-          >
-            <PlusCircleOutlined />
-            Add
-          </Button>
+          {role === 'admin' && (
+            <Button
+              type='primary'
+              className='bg-blue-button flex items-center justify-center'
+              onClick={() => addProduct()}
+            >
+              <PlusCircleOutlined />
+              Add
+            </Button>
+          )}
           <Button onClick={() => clearFilters()} className='text-black'>
             Clear Filters
           </Button>
