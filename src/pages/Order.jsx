@@ -351,7 +351,7 @@ const Orders = ({ initial }) => {
       title: 'Address',
       dataIndex: 'address',
       key: 'address',
-      width: 30,
+      width: 25,
       ...getColumnSearchProps('address', null, option),
       sorter: (a, b) => sort(a, b, 'address'),
       sortDirections: ['descend', 'ascend']
@@ -364,6 +364,17 @@ const Orders = ({ initial }) => {
       sorter: (a, b) => sort(a, b, 'date'),
       sortDirections: ['descend', 'ascend'],
       render: (_, r) => <p>{reformatDate(r.date.substring(0, 10))}</p>
+    },
+    {
+      title: 'Delivered Date',
+      key: 'deliveredDate',
+      width: 10,
+      ...getColumnSearchProps('deliveredDate', 'updatedAt', option),
+      sorter: (a, b) => sort(a, b, 'updatedAt'),
+      sortDirections: ['descend', 'ascend'],
+      render: (_, r) => (
+        <p>{reformatDate((r.updatedAt || '    -  -  ').substring(0, 10))}</p>
+      )
     },
     {
       title: 'Status',

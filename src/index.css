@@ -5,11 +5,10 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
-
 body {
   margin: 0;
-  font-family: 'Ubuntu', -apple-system, BlinkMacSystemFont, 'Roboto', 'Segoe UI', 'Oxygen',
-     'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: 'Ubuntu', -apple-system, BlinkMacSystemFont, 'Roboto', 'Segoe UI',
+    'Oxygen', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -18,4 +17,12 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.bar-chart {
+  background: transparent
+    linear-gradient(62deg, #00369e 0%, #005cfd 53%, #a18dff 100%) 0% 0%
+    no-repeat padding-box;
+  box-shadow: 0px 4px 6px #0000001f;
+  border-radius: 8px;
 }
