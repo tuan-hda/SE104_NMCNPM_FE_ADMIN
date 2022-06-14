@@ -6,6 +6,9 @@ import * as routes from '../api/apiRoutes'
 import { useSelector } from 'react-redux'
 import moment from 'moment'
 import { type } from '@testing-library/user-event/dist/type'
+import { v4 } from 'uuid'
+import { storage } from '../firebase'
+import { useRef } from 'react'
 const { Option } = Select
 
 const FormPromotionModify = ({
@@ -20,9 +23,10 @@ const FormPromotionModify = ({
   const [loading, setLoading] = useState(false)
   const [imgUrl, setImgUrl] = useState(initial?.banner)
   const { currentUser } = useSelector(state => state.user)
+  const initialImage = useRef()
 
   const clearFields = () => {
-    setImgUrl(false)
+    setImgUrl('')
     setLoading(false)
   }
 
@@ -31,56 +35,76 @@ const FormPromotionModify = ({
     clearFields()
     form.resetFields()
   }
-
-  const addItem = async values => {
-    console.log(values.banner)
-    // try {
-    //   const token = await currentUser.getIdToken()
-    //   await appApi.post(
-    //     routes.ADD_PROMOTION,
-    //     routes.getAddPromotionBody(
-    //       values.name,
-    //       values.begin.toDate(),
-    //       values.end.toDate(),
-    //       values.value,
-    //       values.banner
-    //     ),
-    //     routes.getAccessTokenHeader(token)
-    //   )
-
-    //   await fetchPromotion()
-    //   console.log('Success')
-    // } catch (err) {
-    //   console.log(err)
-    // }
-  }
-
-  const updateItem = async values => {
+  const addItem = async (values, url) => {
     try {
       const token = await currentUser.getIdToken()
-      await appApi.put(
+      const result = await appApi.post(
+        routes.ADD_PROMOTION,
+        routes.getAddPromotionBody(
+          values.name,
+          values.begin.toDate(),
+          values.end.toDate(),
+          values.value,
+           url ? url : values.banner,
+        ),
+        routes.getAccessTokenHeader(token)
+      )
+      console.log(result)
+      if (result.data.errCode===0) {
+        await fetchPromotion()
+        message.success('New promotion added!'); 
+      }
+      else {
+        message.error(result.data.errMessage);
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const updateItem = async (values, url) => {
+    console.log(initial.id,
+      values.name,
+      values.begin.toDate(),
+      values.end.toDate(),
+      url ? url : values.banner,
+      values.value)
+    try {
+      const token = await currentUser.getIdToken()
+      const result = await appApi.put(
         routes.UPDATE_PROMOTION,
         routes.getUpdatePromotionBody(
           initial.id,
           values.name,
-          values.begin,
-          values.end,
-          values.banner,
+          values.begin.toDate(),
+          values.end.toDate(),
+          url ? url : values.banner,
           values.value
         ),
         routes.getAccessTokenHeader(token)
       )
-
-      await fetchPromotion()
-      console.log('Success')
+      console.log(result)
+      if (result.data.errCode===0) {
+        await fetchPromotion()
+        message.success('Promotion updated successfully!'); 
+      }
+      else {
+        message.error(result.data.errMessage);
+      }
     } catch (err) {
       console.log(err)
     }
   }
 
   const handleResult = values => {
-    if (!initial) addItem(values)
-    else updateItem(values)
+    if (!initial) {
+      if (!values.banner) addItem(values)
+      else handleUploadImage(values, values.banner, addItem)
+    } else {
+      // If image doesn't change, dont upload it to Firebase storage
+      if (initialImage.current === imgUrl) updateItem(values)
+      else handleUploadImage(values, values.banner, updateItem)
+    }
   }
 
   const onOk = () => {
@@ -97,6 +121,31 @@ const FormPromotionModify = ({
       })
   }
 
+  const handleUploadImage = (values, image, callback) => {
+    // Generate a random id to make sure images' name are not duplicate
+    const imageName = v4()
+    // Get extension of image (jpg/png)
+    console.log(image.file.name)
+    const imageExt = image.file.name.split('.').pop()
+    const name = imageName + '.' + imageExt
+    const task = storage.ref(`banners/${name}`).put(image.file.originFileObj)
+    task.on(
+      'state_changed',
+      snapshot => {},
+      error => {
+        console.log(error)
+      },
+      () => {
+        storage
+          .ref('banners')
+          .child(name)
+          .getDownloadURL()
+          .then(url => {
+            callback(values, url)
+          })
+      }
+    )
+  }
   const handleUpload = info => {
     setLoading(true)
 
@@ -125,9 +174,11 @@ const FormPromotionModify = ({
     return isJpgOrPng
   }
 
+
   useEffect(() => {
     form.resetFields()
-    setImgUrl(initial?.itemImage)
+    initialImage.current = initial?.banner
+    setImgUrl(initial?.banner)
   }, [initial, form])
   
 
@@ -184,15 +235,11 @@ const FormPromotionModify = ({
         <Form.Item
           name='value'
           label='Value (%)'
-          initialValue={initial?.value}
+          initialValue={isNaN(initial?.value*100) ? '' : initial?.value*100}
           rules={[
             {
               required: true,
               message: "You must enter promotion's value!"
-            },
-            {
-              pattern: /[0-1]/,
-              message: 'Value must be a number from 0-100'
             }
           ]}
         >

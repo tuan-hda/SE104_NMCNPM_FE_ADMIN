@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Table, Input, Button, Space, Tooltip, Modal, Spin } from 'antd'
+import { Table, Input, Button, Space, Tooltip, Modal, Spin,message } from 'antd'
 import {
   SearchOutlined,
   EditOutlined,
@@ -192,45 +192,38 @@ const Promotion = () => {
   const confirm = id => {
     Modal.confirm({
       title: 'Warning',
-      content: 'Are you sure you want to remove this item?',
+      content: 'Are you sure you want to remove this promotion?',
       cancelText: 'Cancel',
       okType: 'danger',
-      onOk: () => deleteItem(id)
+      onOk: () => deletePromotion(id)
     })
   }
 
-  const deleteItem = async id => {
+  const deletePromotion = async id => {
+    const token = await currentUser.getIdToken()
+    console.log(routes.DELETE_PROMOTION, {
+      ...routes.getAccessTokenHeader(token),
+      ...routes.getDeletePromotionBody(id)
+    })
     try {
-      console.log(
-        'Delete item (use update): ',
-        routes.getUpdateItemBody(
-          id,
-          promotion[id].itemName,
-          promotion[id].typeValue,
-          promotion[id].itemImage,
-          promotion[id].price.substring(2),
-          promotion[id].calories,
-          promotion[id].featured,
-          0
-        )
-      )
       const token = await currentUser.getIdToken()
-      await appApi.put(
-        routes.UPDATE_ITEM,
-        routes.getUpdateItemBody(
-          id,
-          promotion[id].itemName,
-          promotion[id].typeValue,
-          promotion[id].itemImage,
-          promotion[id].price.substring(2),
-          promotion[id].calories,
-          promotion[id].featured,
-          0
-        ),
-        routes.getAccessTokenHeader(token)
+      const result = await appApi.delete(routes.DELETE_PROMOTION, {
+        headers: {
+          Authorization: 'Bearer ' + token
+        },
+        data: {
+          id: id
+        }
+      }
       )
-      await fetchPromotion()
-      console.log('Success')
+      console.log(result)
+      if (result.data.errCode===0) {
+        await fetchPromotion()
+        message.success('Promotion deleted successfully!'); 
+      }
+      else {
+        message.error(result.data.errMessage);
+      }
     } catch (err) {
       console.log(err)
     }

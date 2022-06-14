@@ -44,7 +44,8 @@ const FormChangeStatus = ({
       const token = await currentUser.getIdToken()
       await appApi.put(
         routes.UPDATE_STAFF_STATUS,
-        routes.getStaffStatusConfig(token,initial?.id,convertToStaffStatus(values.status))
+        routes.getStaffStatusBody(convertToStaffStatus(values.status)),
+        routes.getUpdateStatusHeader(token,initial.id)
       )
       await fetchStaff()
       console.log('Success')
