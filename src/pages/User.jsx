@@ -292,14 +292,6 @@ const User = () => {
         initial={currItem}
         setInitial={setCurrItem}
       />
-      <FormChangeRole
-        title={'Edit role'}
-        isShowing={isShowing && !isProfile}
-        onCancel={handleCancel}
-        onCreate={handleSave}
-        initial={currItem}
-        setInitial={setCurrItem}
-      />
     </React.Fragment>
   )
 }
