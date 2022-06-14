@@ -12,6 +12,7 @@ import useModal from '../utils/useModal'
 import FormPromotionModify from '../components/FormPromotionModify'
 import { useSelector } from 'react-redux'
 import removeAccents from '../utils/removeAccents'
+import moment from 'moment'
 
 let result = []
 
@@ -229,8 +230,7 @@ const Promotion = () => {
     }
   }
   const reformatDate = date => {
-    const dates = date.split('-')
-    return dates[2] + '-' + dates[1] + '-' + dates[0]
+    return moment(date).format('DD-MM-YYYY HH:mm')
   }
 
   const columns = [
@@ -269,7 +269,7 @@ const Promotion = () => {
       ...getColumnSearchProps('date'),
       sorter: (a, b) => sort(a, b, 'date'),
       sortDirections: ['descend', 'ascend'],
-      render: (_, r) => <p>{reformatDate(r.begin.substring(0, 10))}</p>
+      render: (_, r) => <p>{reformatDate(r.begin)}</p>
     },
     {
       title: 'End',
@@ -278,7 +278,7 @@ const Promotion = () => {
       ...getColumnSearchProps('date'),
       sorter: (a, b) => sort(a, b, 'date'),
       sortDirections: ['descend', 'ascend'],
-      render: (_, r) => <p>{reformatDate(r.end.substring(0, 10))}</p>
+      render: (_, r) => <p>{reformatDate(r.end)}</p>
     },
     {
       title: 'Banner',
@@ -326,7 +326,7 @@ const Promotion = () => {
   return (
     <React.Fragment>
       <h1 className='flex items-center justify-between mb-4'>
-        <strong className='text-xl'>Item List</strong>
+        <strong className='text-xl'>Promotion List</strong>
         <div className='flex gap-2'>
           <Button
             type='primary'

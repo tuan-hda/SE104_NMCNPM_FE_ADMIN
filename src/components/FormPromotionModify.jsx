@@ -249,7 +249,7 @@ const FormPromotionModify = ({
         <Form.Item
           name='begin'
           label='Begin'
-          initialValue={moment({hour:0,minute:0})}
+          initialValue={initial?.begin ? moment(initial.begin) : moment({hour:0,minute:0})}
           rules={[
             {
               type: 'object'
@@ -265,7 +265,7 @@ const FormPromotionModify = ({
         <Form.Item
           name='end'
           label='End'
-          initialValue={moment({hour:0,minute:0}).add(1,'days')}
+          initialValue={initial?.end ? moment(initial.end) : moment({hour:0,minute:0}).add(1,'days')}
           rules={[
             {
               type: 'object'
