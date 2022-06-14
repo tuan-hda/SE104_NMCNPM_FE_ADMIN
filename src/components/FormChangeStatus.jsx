@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Form, Modal, Select} from 'antd'
+import { Form, Modal, Select,message} from 'antd'
 import { } from '@ant-design/icons'
 import { useSelector } from 'react-redux'
 import appApi from '../api/appApi'
@@ -42,13 +42,18 @@ const FormChangeStatus = ({
     // console.log(routes.getStaffStatusConfig(token,initial?.id,convertToStaffStatus(values.status)))
     try {
       const token = await currentUser.getIdToken()
-      await appApi.put(
+      const result = await appApi.put(
         routes.UPDATE_STAFF_STATUS,
         routes.getStaffStatusBody(convertToStaffStatus(values.status)),
         routes.getUpdateStatusHeader(token,initial.id)
       )
-      await fetchStaff()
-      console.log('Success')
+      if (result.data.errCode===0) {
+        await fetchStaff()
+        message.success('Status updated successfully!'); 
+      }
+      else {
+        message.error(result.data.errMessage);
+      }
     } catch (err) {
       console.log(err)
     }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Form, Modal, Select} from 'antd'
+import { Form, Modal, Select, message} from 'antd'
 import { } from '@ant-design/icons'
 import { useSelector } from 'react-redux'
 import appApi from '../api/appApi'
@@ -55,8 +55,13 @@ const FormChangeRole = ({
         routes.getAccessTokenHeader(token)
       )
       console.log(result)
-      await fetchStaff()
-      console.log('Success')
+      if (result.data.errCode===0) {
+        await fetchStaff()
+        message.success('Role changed successfully!'); 
+      }
+      else {
+        message.error(result.data.errMessage);
+      }
     } catch (err) {
       console.log(err)
     }
