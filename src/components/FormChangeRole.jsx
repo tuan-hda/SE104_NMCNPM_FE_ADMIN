@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Form, Modal, Select} from 'antd'
+import { Form, Modal, Select, message} from 'antd'
 import { } from '@ant-design/icons'
 import { useSelector } from 'react-redux'
 import appApi from '../api/appApi'
@@ -56,7 +56,7 @@ const FormChangeRole = ({
       )
       console.log(result)
       await fetchStaff()
-      console.log('Success')
+      message.success('Role changed successfully!'); 
     } catch (err) {
       console.log(err)
     }
