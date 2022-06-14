@@ -56,7 +56,7 @@ const FormProductModify = ({
           values.name,
           values.category,
           url ? url : values.image,
-          parseInt(values.price),
+          values.price,
           values.calories,
           values.featured ? 1 : 0
         )
@@ -67,7 +67,7 @@ const FormProductModify = ({
           values.name,
           values.category,
           url ? url : values.image,
-          parseInt(values.price),
+          values.price,
           values.calories,
           values.featured ? 1 : 0
         ),
@@ -145,6 +145,7 @@ const FormProductModify = ({
   }
 
   const handleUploadImage = (values, image, callback) => {
+    setLoading(true)
     // Generate a random id to make sure images' name are not duplicate
     const imageName = v4()
     // Get extension of image (jpg/png)
@@ -164,6 +165,9 @@ const FormProductModify = ({
           .getDownloadURL()
           .then(url => {
             callback(values, url)
+          })
+          .finally(() => {
+            setLoading(false)
           })
       }
     )
@@ -275,10 +279,6 @@ const FormProductModify = ({
             {
               required: true,
               message: "You must enter product's price!"
-            },
-            {
-              pattern: /^[0-9]*$/,
-              message: 'Price must be an integer'
             }
           ]}
         >

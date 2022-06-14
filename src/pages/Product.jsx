@@ -52,6 +52,7 @@ const Product = () => {
   const { isShowing, toggle } = useModal()
   const { isShowing: isShowing2, toggle: toggle2 } = useModal()
   const { currentUser } = useSelector(state => state.user)
+  const role = useSelector(state => state.role)
 
   // Fetch product data
   const fetchProduct = async () => {
@@ -332,29 +333,32 @@ const Product = () => {
       title: 'Action',
       key: 'operation',
       fixed: 'right',
-      width: 18,
-      render: (_, r) => (
-        <div className='flex gap-4'>
-          <Tooltip title='Edit'>
-            <Button
-              onClick={() => showModal(r.id)}
-              icon={<EditOutlined />}
-              type='primary'
-              className='bg-blue-button'
-            />
-          </Tooltip>
+      width: role === 'admin' ? 18 : 1,
+      render: (_, r) => {
+        if (role !== 'admin') return null
+        return (
+          <div className='flex gap-4'>
+            <Tooltip title='Edit'>
+              <Button
+                onClick={() => showModal(r.id)}
+                icon={<EditOutlined />}
+                type='primary'
+                className='bg-blue-button'
+              />
+            </Tooltip>
 
-          <Tooltip title='Remove'>
-            <Button
-              onClick={() => confirm(r.id)}
-              danger={r.available}
-              icon={<DeleteOutlined />}
-              type='primary'
-              disabled={!r.available}
-            />
-          </Tooltip>
-        </div>
-      )
+            <Tooltip title='Remove'>
+              <Button
+                onClick={() => confirm(r.id)}
+                danger={r.available}
+                icon={<DeleteOutlined />}
+                type='primary'
+                disabled={!r.available}
+              />
+            </Tooltip>
+          </div>
+        )
+      }
     }
   ]
 
@@ -362,6 +366,8 @@ const Product = () => {
     toggle(true)
     setCurrItem(null)
   }
+
+  if (role === null) return null
 
   return (
     <React.Fragment>

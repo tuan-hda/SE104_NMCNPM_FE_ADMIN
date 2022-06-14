@@ -12,6 +12,7 @@ import { useSelector } from 'react-redux'
 import removeAccents from '../utils/removeAccents'
 import ExpandOrderItem from '../components/ExpandOrderItem'
 import getProvinceName from '../utils/getProvinceName'
+import round2digits from '../utils/round2digits'
 
 let pending = []
 let rest = []
@@ -345,7 +346,10 @@ const Orders = ({ initial }) => {
       width: 10,
       ...getColumnSearchProps('total', null, option),
       sorter: (a, b) => sort(a, b, 'total'),
-      sortDirections: ['descend', 'ascend']
+      sortDirections: ['descend', 'ascend'],
+      render: (_, r) => (
+        <span className='text-red-500'>{round2digits(r.total)}</span>
+      )
     },
     {
       title: 'Address',
