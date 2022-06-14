@@ -154,17 +154,13 @@ export const getAddPromotionBody = (
   value,
   banner
 })
-//DELETE PROMOTION
-export const DELETE_PROMOTION = 'delete-promotion'
-export const getDeletePromotionBody = (id) => ({
-  id
-})
 
 //DELETE PROMOTION
 export const DELETE_PROMOTION = 'delete-promotion'
 export const getDeletePromotionBody = (id) => ({
   id
 })
+
 
 
 // UPDATE PROMOTION
