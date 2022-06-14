@@ -13,6 +13,7 @@ import { logoutInitiate } from '../actions'
 import { MdFastfood } from 'react-icons/md'
 import { TbDiscount2 } from 'react-icons/tb'
 import { GiFoodTruck } from 'react-icons/gi'
+import { IoIosStats } from 'react-icons/io'
 const { Sider } = Layout
 
 const AppMenu = () => {
@@ -59,7 +60,8 @@ const AppMenu = () => {
     getItem('User', '4', <UserOutlined />, () => redirectTo('user')),
     getItem('Staff', '5', <IdcardOutlined />, () => redirectTo('staff')),
     getItem('Promotion', '6', <TbDiscount2 />, () => redirectTo('promotion')),
-    getItem('Sign out', '7', <LogoutOutlined />, () => confirm(), {
+    getItem('Statistic', '7', <IoIosStats />, () => redirectTo('statistic')),
+    getItem('Sign out', '8', <LogoutOutlined />, () => confirm(), {
       backgroundColor: 'transparent'
     })
   ]
@@ -79,8 +81,10 @@ const AppMenu = () => {
         return ['5']
       case 'promotion':
         return ['6']
+      case 'statistic':
+        return ['7']
       default:
-        return ['0']
+        return ['8']
     }
   }
 

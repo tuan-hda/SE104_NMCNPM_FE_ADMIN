@@ -12,6 +12,7 @@ import NotFound from './pages/NotFound'
 import Order from './pages/Order'
 import AllOrders from './pages/AllOrders'
 import Staff from './pages/Staff'
+import Statistics from './pages/Statistics'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -37,7 +38,8 @@ const App = () => {
         <Route path='promotion' element={<Promotion />} />
         <Route path='order' element={<Order />} />
         <Route path='all-orders' element={<AllOrders />} />
-        <Route path='staff' element={<Staff/>}/>
+        <Route path='staff' element={<Staff />} />
+        <Route path='statistic' element={<Statistics />} />
       </Route>
       <Route path='/notfound' element={<NotFound signout={true} />} />
       <Route path='*' element={<NotFound />} />

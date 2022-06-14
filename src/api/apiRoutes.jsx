@@ -100,7 +100,7 @@ export const GET_ALL_USERS = 'get-all-users'
 export const CHANGE_ROLE = 'change-role'
 export const getChangeRoleConfig = (token, id, roleID) => ({
   headers: {
-    Authorization: 'Bearer ' + token  
+    Authorization: 'Bearer ' + token
   },
   params: {
     id: id
@@ -216,5 +216,21 @@ export const GET_RESTAURANT = 'get-all-restaurants'
 export const getRestaurantParams = id => ({
   params: {
     id: id
+  }
+})
+
+// STATISTICS
+export const GET_TODAY_REPORT = 'get-today-reports'
+export const GET_DAILY_REPORT = 'get-all-daily-reports'
+export const getDailyReportBody = (year, month) => ({
+  params: {
+    year,
+    month
+  }
+})
+export const GET_MONTHLY_REPORT = 'get-all-monthly-reports'
+export const getMonthlyBody = year => ({
+  params: {
+    year
   }
 })
