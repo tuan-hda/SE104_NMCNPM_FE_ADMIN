@@ -366,7 +366,7 @@ const Orders = ({ initial }) => {
       render: (_, r) => <p>{reformatDate(r.date.substring(0, 10))}</p>
     },
     {
-      title: 'Delivered Date',
+      title: 'Delivered',
       key: 'deliveredDate',
       width: 10,
       ...getColumnSearchProps('deliveredDate', 'updatedAt', option),

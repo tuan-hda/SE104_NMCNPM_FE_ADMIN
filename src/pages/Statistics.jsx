@@ -149,7 +149,7 @@ const Statistic = () => {
   const data = [
     {
       title: "Today's revenue",
-      value: '$ ' + todayReports.dailyReport?.revenue,
+      value: '$ ' + (todayReports.dailyReport?.revenue || 0),
       icon: <BsCurrencyDollar />
     },
     {
@@ -215,7 +215,9 @@ const Statistic = () => {
 
       <div className=''>
         <EChart data={reports} month={parseInt(month)} year={year} />
+        <p className='text-center font-bold text-xl mt-2 mb-12'>Revenue</p>
         <LineChart data={reports} month={parseInt(month)} year={year} />
+        <p className='text-center font-bold text-xl mt-2 mb-12'>Bill Count</p>
       </div>
     </>
   )

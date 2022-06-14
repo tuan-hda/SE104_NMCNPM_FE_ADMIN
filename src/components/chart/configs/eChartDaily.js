@@ -52,7 +52,7 @@ const eChartDaily = arr => ({
     tooltip: {
       y: {
         formatter: function (val) {
-          return '$ ' + val + ' thousands'
+          return '$ ' + val
         }
       }
     }
