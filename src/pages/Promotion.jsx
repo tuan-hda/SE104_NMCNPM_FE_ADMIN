@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Table, Input, Button, Space, Tooltip, Modal, Spin } from 'antd'
+import { Table, Input, Button, Space, Tooltip, Modal, Spin,message } from 'antd'
 import {
   SearchOutlined,
   EditOutlined,
@@ -12,6 +12,7 @@ import useModal from '../utils/useModal'
 import FormPromotionModify from '../components/FormPromotionModify'
 import { useSelector } from 'react-redux'
 import removeAccents from '../utils/removeAccents'
+import moment from 'moment'
 
 let result = []
 
@@ -192,52 +193,44 @@ const Promotion = () => {
   const confirm = id => {
     Modal.confirm({
       title: 'Warning',
-      content: 'Are you sure you want to remove this item?',
+      content: 'Are you sure you want to remove this promotion?',
       cancelText: 'Cancel',
       okType: 'danger',
-      onOk: () => deleteItem(id)
+      onOk: () => deletePromotion(id)
     })
   }
 
-  const deleteItem = async id => {
+  const deletePromotion = async id => {
+    const token = await currentUser.getIdToken()
+    console.log(routes.DELETE_PROMOTION, {
+      ...routes.getAccessTokenHeader(token),
+      ...routes.getDeletePromotionBody(id)
+    })
     try {
-      console.log(
-        'Delete item (use update): ',
-        routes.getUpdateItemBody(
-          id,
-          promotion[id].itemName,
-          promotion[id].typeValue,
-          promotion[id].itemImage,
-          promotion[id].price.substring(2),
-          promotion[id].calories,
-          promotion[id].featured,
-          0
-        )
-      )
       const token = await currentUser.getIdToken()
-      await appApi.put(
-        routes.UPDATE_ITEM,
-        routes.getUpdateItemBody(
-          id,
-          promotion[id].itemName,
-          promotion[id].typeValue,
-          promotion[id].itemImage,
-          promotion[id].price.substring(2),
-          promotion[id].calories,
-          promotion[id].featured,
-          0
-        ),
-        routes.getAccessTokenHeader(token)
+      const result = await appApi.delete(routes.DELETE_PROMOTION, {
+        headers: {
+          Authorization: 'Bearer ' + token
+        },
+        data: {
+          id: id
+        }
+      }
       )
-      await fetchPromotion()
-      console.log('Success')
+      console.log(result)
+      if (result.data.errCode===0) {
+        await fetchPromotion()
+        message.success('Promotion deleted successfully!'); 
+      }
+      else {
+        message.error(result.data.errMessage);
+      }
     } catch (err) {
       console.log(err)
     }
   }
   const reformatDate = date => {
-    const dates = date.split('-')
-    return dates[2] + '-' + dates[1] + '-' + dates[0]
+    return moment(date).format('DD-MM-YYYY HH:mm')
   }
 
   const columns = [
@@ -276,7 +269,7 @@ const Promotion = () => {
       ...getColumnSearchProps('date'),
       sorter: (a, b) => sort(a, b, 'date'),
       sortDirections: ['descend', 'ascend'],
-      render: (_, r) => <p>{reformatDate(r.begin.substring(0, 10))}</p>
+      render: (_, r) => <p>{reformatDate(r.begin)}</p>
     },
     {
       title: 'End',
@@ -285,7 +278,7 @@ const Promotion = () => {
       ...getColumnSearchProps('date'),
       sorter: (a, b) => sort(a, b, 'date'),
       sortDirections: ['descend', 'ascend'],
-      render: (_, r) => <p>{reformatDate(r.end.substring(0, 10))}</p>
+      render: (_, r) => <p>{reformatDate(r.end)}</p>
     },
     {
       title: 'Banner',
@@ -333,7 +326,7 @@ const Promotion = () => {
   return (
     <React.Fragment>
       <h1 className='flex items-center justify-between mb-4'>
-        <strong className='text-xl'>Item List</strong>
+        <strong className='text-xl'>Promotion List</strong>
         <div className='flex gap-2'>
           <Button
             type='primary'
