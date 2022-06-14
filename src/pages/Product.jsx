@@ -330,7 +330,7 @@ const Product = () => {
       )
     },
     {
-      title: 'Action',
+      title: role === 'admin' && 'Action',
       key: 'operation',
       fixed: 'right',
       width: role === 'admin' ? 18 : 1,
