@@ -13,9 +13,17 @@ import { useSelector } from 'react-redux'
 import FormChangeRole from '../components/FormChangeRole'
 import FormChangeStatus from '../components/FormChangeStatus'
 import FormAddStaff from '../components/FormAddStaff'
+import NotFound from './NotFound'
 
 let result = []
 const Staff = () => {
+  const role = useSelector(state => state.role)
+
+  if (!role || role === 'staff') return <NotFound isChildComponent />
+  return <StaffContainer/>
+}
+
+const StaffContainer = () => {
   const searchInput = useRef(null)
 
   const [staffs, setStaffs] = useState([])
