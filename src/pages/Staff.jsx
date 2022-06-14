@@ -245,7 +245,7 @@ const Staff = () => {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
-      width: 30,
+      width: 25,
       ...getColumnSearchProps('name', 'name'),
       sorter: (a, b) => sort(a, b, 'name'),
       sortDirections: ['descend', 'ascend'],
@@ -266,7 +266,7 @@ const Staff = () => {
       title: 'Phone number',
       dataIndex: 'phoneNumber',
       key: 'phoneNumber',
-      width: 20,
+      width: 25,
       ...getColumnSearchProps('phoneNumber'),
       sorter: (a, b) => sort(a, b, 'phoneNumber'),
       sortDirections: ['descend', 'ascend'],
@@ -283,17 +283,18 @@ const Staff = () => {
       render: (_, r) => <p className=''>{r.Restaurant.resAddress}</p>
     },
     {
-      title: 'Status',
-      key: 'statusValue',
+      title: 'Role',
+      key: 'roleValue',
       width: 16,
-      sorter: (a, b) => sort(a, b, 'statusValue'),
+      sorter: (a, b) => sort(a, b, 'roleValue'),
       sortDirections: ['descend', 'ascend'],
       render: (_, r) => {
-        switch (r.staffStatus) {
+        switch (r.User.roleID) {
+          case 0:
+            return <Tag color='red'>{r.User.roleData.value}</Tag>
           case 1:
-            return <Tag color='green'>{r.staffstatusData.value}</Tag> //#87d068
+            return <Tag color='yellow'>{r.User.roleData.value}</Tag>
           default:
-            return <Tag color='red'>{r.staffstatusData.value}</Tag>
         }
       }
     },
@@ -307,18 +308,17 @@ const Staff = () => {
       render: (_, r) => <p>{reformatDate(r.workingDay.substring(0, 10))}</p>
     },
     {
-      title: 'Role',
-      key: 'roleValue',
+      title: 'Status',
+      key: 'statusValue',
       width: 16,
-      sorter: (a, b) => sort(a, b, 'roleValue'),
+      sorter: (a, b) => sort(a, b, 'statusValue'),
       sortDirections: ['descend', 'ascend'],
       render: (_, r) => {
-        switch (r.User.roleID) {
-          case 0:
-            return <Tag color='red'>{r.User.roleData.value}</Tag>
+        switch (r.staffStatus) {
           case 1:
-            return <Tag color='yellow'>{r.User.roleData.value}</Tag>
+            return <Tag color='green'>{r.staffstatusData.value}</Tag> //#87d068
           default:
+            return <Tag color='red'>{r.staffstatusData.value}</Tag>
         }
       }
     },

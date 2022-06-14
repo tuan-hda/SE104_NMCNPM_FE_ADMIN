@@ -57,7 +57,7 @@ const FormChangeRole = ({
       console.log(result)
       if (result.data.errCode===0) {
         await fetchStaff()
-        message.success('Role changed successfully!'); 
+        message.success('Role changed successfully!');
       }
       else {
         message.error(result.data.errMessage);

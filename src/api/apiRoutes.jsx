@@ -103,6 +103,7 @@ export const getChangeRoleBody = ( id,roleID) => ({
   roleID
 })
 
+
 export const SIGN_UP = 'create-new-user'
 export const getSignupBody = (email, name) => ({
   email: email,
@@ -158,6 +159,13 @@ export const DELETE_PROMOTION = 'delete-promotion'
 export const getDeletePromotionBody = (id) => ({
   id
 })
+
+//DELETE PROMOTION
+export const DELETE_PROMOTION = 'delete-promotion'
+export const getDeletePromotionBody = (id) => ({
+  id
+})
+
 
 // UPDATE PROMOTION
 export const UPDATE_PROMOTION = 'update-promotion'
