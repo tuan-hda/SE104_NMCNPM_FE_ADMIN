@@ -8,6 +8,7 @@ import ReportCard from '../components/ReportCard'
 import { AppstoreOutlined, UserOutlined } from '@ant-design/icons'
 import EChart from '../components/chart/EChart'
 import LineChart from '../components/chart/LineChart'
+import NotFound from './NotFound'
 
 const Statistic = () => {
   const [reports, setReports] = useState([])
@@ -17,6 +18,7 @@ const Statistic = () => {
   const [loading, setLoading] = useState([])
   const [year, setYear] = useState(new Date().getFullYear())
   const [month, setMonth] = useState(-1)
+  const role = useSelector(state => state.role)
 
   const { currentUser } = useSelector(state => state.user)
 
@@ -167,6 +169,8 @@ const Statistic = () => {
   useEffect(() => {
     console.log(month === -1)
   }, [month])
+
+  if (!role || role === 'staff') return <NotFound isChildComponent />
 
   return (
     <>
