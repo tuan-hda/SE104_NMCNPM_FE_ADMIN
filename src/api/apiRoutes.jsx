@@ -160,12 +160,6 @@ export const getDeletePromotionBody = (id) => ({
   id
 })
 
-//DELETE PROMOTION
-export const DELETE_PROMOTION = 'delete-promotion'
-export const getDeletePromotionBody = (id) => ({
-  id
-})
-
 
 // UPDATE PROMOTION
 export const UPDATE_PROMOTION = 'update-promotion'
