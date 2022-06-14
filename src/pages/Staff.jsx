@@ -335,6 +335,7 @@ const Staff = () => {
               icon={<UserOutlined />}
               type='primary'
               className='bg-blue-button'
+              hidden={r.UserId===currentUser.uid}
             />
           </Tooltip>
 
@@ -344,7 +345,7 @@ const Staff = () => {
               danger
               icon={<EditOutlined />}
               type='primary'
-              hidden={r.roleValue==='Customer'}
+              hidden={r.UserId===currentUser.uid}
             />
           </Tooltip>
         </div>
