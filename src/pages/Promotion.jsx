@@ -26,6 +26,7 @@ const Promotion = () => {
   const [currItem, setCurrItem] = useState(null)
   const { isShowing, toggle } = useModal()
   const { currentUser } = useSelector(state => state.user)
+  const role = useSelector(state => state.role)
 
   // Fetch promotion data
   const fetchPromotion = async () => {
@@ -302,6 +303,7 @@ const Promotion = () => {
               icon={<EditOutlined />}
               type='primary'
               className='bg-blue-button'
+              hidden= {(!role || role === 'staff')}
             />
           </Tooltip>
 
@@ -311,6 +313,7 @@ const Promotion = () => {
               danger={true}
               icon={<DeleteOutlined />}
               type='primary'
+              hidden= {(!role || role === 'staff')}
             />
           </Tooltip>
         </div>
@@ -332,6 +335,7 @@ const Promotion = () => {
             type='primary'
             className='bg-blue-button flex items-center justify-center'
             onClick={() => addPromotion()}
+            hidden= {(!role || role === 'staff')}
           >
             <PlusCircleOutlined />
             Add
