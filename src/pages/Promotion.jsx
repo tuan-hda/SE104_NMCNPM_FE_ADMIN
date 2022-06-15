@@ -219,12 +219,12 @@ const Promotion = () => {
       }
       )
       console.log(result)
-      if (result.data.errCode===0) {
+      if (result.data.promotion.errCode===0) {
         await fetchPromotion()
         message.success('Promotion deleted successfully!'); 
       }
       else {
-        message.error(result.data.errMessage);
+        message.error(result.data.promotion.errMessage);
       }
     } catch (err) {
       console.log(err)
