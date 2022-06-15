@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Table, Input, Button, Space, Tooltip, Tag,Spin } from 'antd'
+import { Table, Input, Button, Space, Tooltip, Tag, Spin } from 'antd'
 import {
   SearchOutlined,
   EditOutlined,
@@ -20,14 +20,14 @@ const Staff = () => {
   const role = useSelector(state => state.role)
 
   if (!role || role === 'staff') return <NotFound isChildComponent />
-  return <StaffContainer/>
+  return <StaffContainer />
 }
 
 const StaffContainer = () => {
   const searchInput = useRef(null)
 
   const [staffs, setStaffs] = useState([])
-  const [restaurants,setRestaurants] = useState([])
+  const [restaurants, setRestaurants] = useState([])
   const [loading, setLoading] = useState(false)
   const [searchValues, setSearchValues] = useState({})
   const [input, setInput] = useState({})
@@ -40,14 +40,11 @@ const StaffContainer = () => {
   const fetchStaff = async () => {
     try {
       const token = await currentUser.getIdToken()
-      result = await appApi.get(
-        routes.GET_STAFFS_LIST,
-        {
-          headers: {
-            Authorization: 'Bearer ' + token
-          }
+      result = await appApi.get(routes.GET_STAFFS_LIST, {
+        headers: {
+          Authorization: 'Bearer ' + token
         }
-      )
+      })
 
       result = result.data.staffs.map((staff, index) => ({
         ...staff,
@@ -55,8 +52,14 @@ const StaffContainer = () => {
       }))
       // Sort result by id
       result.sort((a, b) => a.id - b.id)
-
-      console.log(result)
+      // Add some fields to results
+      result = result.map(r => ({
+        ...r,
+        email: r.User.email,
+        name: r.User.name,
+        phoneNumber: r.User.phoneNumber,
+        restaurant: r.Restaurant.resAddress
+      }))
       setStaffs(result)
     } catch (err) {
       console.log(err)
@@ -75,11 +78,12 @@ const StaffContainer = () => {
 
       result = result.data.restaurants.map((restaurant, index) => ({
         id: restaurant.id,
-        resAddress:restaurant.resAddress,
+        resAddress: restaurant.resAddress,
         key: index
       }))
       // Sort result by id
       result.sort((a, b) => a.id - b.id)
+
       setRestaurants(result)
     } catch (err) {
       if (err.response) {
@@ -106,7 +110,8 @@ const StaffContainer = () => {
     return String(a[key]).localeCompare(b[key])
   }
 
-  const compareStr = (s1, s2) => s1.toLowerCase().includes(s2.toLowerCase())
+  const compareStr = (s1, s2) =>
+    (s1 || '').toLowerCase().includes(s2.toLowerCase())
 
   useEffect(() => {
     let filteredResult = result
@@ -226,7 +231,10 @@ const StaffContainer = () => {
       />
     ),
     onFilter: (value, record) =>
-      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+      (record[dataIndex] || '')
+        .toString()
+        .toLowerCase()
+        .includes(value.toLowerCase()),
     onFilterDropdownVisibleChange: visible => {
       if (visible) {
         setTimeout(() => searchInput.current?.select(), 100)
@@ -238,7 +246,6 @@ const StaffContainer = () => {
     const dates = date.split('-')
     return dates[2] + '-' + dates[1] + '-' + dates[0]
   }
-
 
   const columns = [
     {
@@ -264,7 +271,7 @@ const StaffContainer = () => {
       dataIndex: 'email',
       key: 'email',
       width: 30,
-      ...getColumnSearchProps('email', 'name'),
+      ...getColumnSearchProps('email', 'email'),
       sorter: (a, b) => sort(a, b, 'email'),
       sortDirections: ['descend', 'ascend'],
       render: (_, r) => <p className=''>{r.User.email}</p>
@@ -282,11 +289,11 @@ const StaffContainer = () => {
     },
     {
       title: 'Restaurant',
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'restaurant',
+      key: 'restaurant',
       width: 35,
-      ...getColumnSearchProps('name', 'name'),
-      sorter: (a, b) => sort(a, b, 'name'),
+      ...getColumnSearchProps('restaurant'),
+      sorter: (a, b) => sort(a, b, 'restaurant'),
       sortDirections: ['descend', 'ascend'],
       render: (_, r) => <p className=''>{r.Restaurant.resAddress}</p>
     },
@@ -343,7 +350,7 @@ const StaffContainer = () => {
               icon={<UserOutlined />}
               type='primary'
               className='bg-blue-button'
-              hidden={r.UserId===currentUser.uid}
+              hidden={r.UserId === currentUser.uid}
             />
           </Tooltip>
 
@@ -353,7 +360,7 @@ const StaffContainer = () => {
               danger
               icon={<EditOutlined />}
               type='primary'
-              hidden={r.UserId===currentUser.uid}
+              hidden={r.UserId === currentUser.uid}
             />
           </Tooltip>
         </div>
@@ -385,19 +392,21 @@ const StaffContainer = () => {
           </Button>
         </div>
       </h1>
-      {loading?<Spin/>:
-      <Table
-        columns={columns}
-        dataSource={staffs}
-        loading={loading}
-        scroll={{
-          x: 1000
-        }}
-      />
-      }
+      {loading ? (
+        <Spin />
+      ) : (
+        <Table
+          columns={columns}
+          dataSource={staffs}
+          loading={loading}
+          scroll={{
+            x: 1000
+          }}
+        />
+      )}
       <FormChangeRole
         title={'Edit role'}
-        isShowing={isShowing && isStatus===0}
+        isShowing={isShowing && isStatus === 0}
         onCancel={handleCancel}
         onCreate={handleSave}
         initial={currItem}
@@ -406,7 +415,7 @@ const StaffContainer = () => {
       />
       <FormChangeStatus
         title={'Update staff status'}
-        isShowing={isShowing && isStatus===1}
+        isShowing={isShowing && isStatus === 1}
         onCancel={handleCancel}
         onCreate={handleSave}
         initial={currItem}
@@ -415,7 +424,7 @@ const StaffContainer = () => {
       />
       <FormAddStaff
         title={'Add new staff'}
-        isShowing={isShowing && isStatus===2}
+        isShowing={isShowing && isStatus === 2}
         onCancel={handleCancel}
         onCreate={handleSave}
         initial={currItem}

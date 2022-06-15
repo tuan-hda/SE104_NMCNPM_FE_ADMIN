@@ -1,9 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Table, Input, Button, Space, Tooltip, Tag } from 'antd'
-import {
-  SearchOutlined,
-  UserOutlined
-} from '@ant-design/icons'
+import { SearchOutlined, UserOutlined } from '@ant-design/icons'
 import appApi from '../api/appApi'
 import * as routes from '../api/apiRoutes'
 import useModal from '../utils/useModal'
@@ -16,10 +13,9 @@ const User = () => {
   const role = useSelector(state => state.role)
 
   if (!role || role === 'staff') return <NotFound isChildComponent />
-  return <UserContainer/>
+  return <UserContainer />
 }
 const UserContainer = () => {
-  
   const searchInput = useRef(null)
 
   const [users, setUsers] = useState([])
@@ -65,7 +61,8 @@ const UserContainer = () => {
     return String(a[key]).localeCompare(b[key])
   }
 
-  const compareStr = (s1, s2) => s1.toLowerCase().includes(s2.toLowerCase())
+  const compareStr = (s1, s2) =>
+    (s1 || '').toLowerCase().includes((s2 || '').toLowerCase())
 
   useEffect(() => {
     let filteredResult = result
@@ -181,7 +178,10 @@ const UserContainer = () => {
       />
     ),
     onFilter: (value, record) =>
-      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+      (record[dataIndex] || '')
+        .toString()
+        .toLowerCase()
+        .includes((value || '').toLowerCase()),
     onFilterDropdownVisibleChange: visible => {
       if (visible) {
         setTimeout(() => searchInput.current?.select(), 100)

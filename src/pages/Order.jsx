@@ -372,7 +372,7 @@ const Orders = ({ initial }) => {
     {
       title: 'Delivered',
       key: 'deliveredDate',
-      width: 10,
+      width: 12,
       ...getColumnSearchProps('deliveredDate', 'updatedAt', option),
       sorter: (a, b) => sort(a, b, 'updatedAt'),
       sortDirections: ['descend', 'ascend'],
