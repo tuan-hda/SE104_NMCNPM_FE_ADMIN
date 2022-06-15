@@ -3,6 +3,7 @@ import appApi from '../api/appApi'
 import * as routes from '../api/apiRoutes'
 import { useEffect } from 'react'
 import { List } from 'antd'
+import round2digits from '../utils/round2digits'
 
 const ExpandOrderItem = ({ id, currentUser }) => {
   const [loading, setLoading] = useState(false)
@@ -60,7 +61,7 @@ const ExpandOrderItem = ({ id, currentUser }) => {
                     <p className='font-semibold'>{item?.Item?.itemName}</p>
                     <div className='flex justify-between'>
                       <p className='text-blue-500'>x {item?.number}</p>
-                      <p>$ {item?.currentprice}</p>
+                      <p>$ {round2digits(item?.currentprice)}</p>
                     </div>
                   </div>
                 </div>
@@ -72,7 +73,9 @@ const ExpandOrderItem = ({ id, currentUser }) => {
       <p className='border-t-[1px] my-4 w-[120%] -mx-10' />
       <div className='flex items-center float-right gap-4'>
         <p>Total: </p>
-        <p className='text-xl text-red-500'>$ {calculateTotal(items)}</p>
+        <p className='text-xl text-red-500'>
+          $ {round2digits(calculateTotal(items))}
+        </p>
       </div>
     </>
   )

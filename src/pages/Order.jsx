@@ -12,6 +12,7 @@ import { useSelector } from 'react-redux'
 import removeAccents from '../utils/removeAccents'
 import ExpandOrderItem from '../components/ExpandOrderItem'
 import getProvinceName from '../utils/getProvinceName'
+import round2digits from '../utils/round2digits'
 
 let pending = []
 let rest = []
@@ -345,13 +346,16 @@ const Orders = ({ initial }) => {
       width: 10,
       ...getColumnSearchProps('total', null, option),
       sorter: (a, b) => sort(a, b, 'total'),
-      sortDirections: ['descend', 'ascend']
+      sortDirections: ['descend', 'ascend'],
+      render: (_, r) => (
+        <span className='text-red-500'>{round2digits(r.total)}</span>
+      )
     },
     {
       title: 'Address',
       dataIndex: 'address',
       key: 'address',
-      width: 30,
+      width: 25,
       ...getColumnSearchProps('address', null, option),
       sorter: (a, b) => sort(a, b, 'address'),
       sortDirections: ['descend', 'ascend']
@@ -364,6 +368,17 @@ const Orders = ({ initial }) => {
       sorter: (a, b) => sort(a, b, 'date'),
       sortDirections: ['descend', 'ascend'],
       render: (_, r) => <p>{reformatDate(r.date.substring(0, 10))}</p>
+    },
+    {
+      title: 'Delivered',
+      key: 'deliveredDate',
+      width: 12,
+      ...getColumnSearchProps('deliveredDate', 'updatedAt', option),
+      sorter: (a, b) => sort(a, b, 'updatedAt'),
+      sortDirections: ['descend', 'ascend'],
+      render: (_, r) => (
+        <p>{reformatDate((r.updatedAt || '    -  -  ').substring(0, 10))}</p>
+      )
     },
     {
       title: 'Status',
