@@ -25,7 +25,40 @@ const Orders = ({ initial }) => {
   const [searchValues, setSearchValues] = useState({})
   const [searchValues2, setSearchValues2] = useState({})
   const [input, setInput] = useState({})
+  const [restaurants, setRestaurants] = useState([])
   const { currentUser } = useSelector(state => state.user)
+
+  // Fetch restaurants
+  const fetchRestaurant = async () => {
+    try {
+      let result = await appApi.get(
+        routes.GET_RESTAURANT,
+        routes.getRestaurantParams('ALL')
+      )
+      console.log(result.data)
+
+      result = result.data.restaurants.map((restaurant, index) => ({
+        id: restaurant.id,
+        resAddress: restaurant.resAddress,
+        key: index
+      }))
+      // Sort result by id
+      result.sort((a, b) => a.id - b.id)
+
+      setRestaurants(result)
+      console.log(result)
+    } catch (err) {
+      if (err.response) {
+        console.log(err.response.data)
+        console.log(err.response.status)
+        console.log(err.response.headers)
+      } else {
+        console.log(err.message)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Fetch orders
   const fetchOrders = async () => {
@@ -42,7 +75,7 @@ const Orders = ({ initial }) => {
         routes.getAccessTokenHeader(token)
       )
 
-      console.log(result)
+      console.log(result.data.orders)
 
       result = result.data.orders.map((res, index) => ({
         ...res,
@@ -84,6 +117,7 @@ const Orders = ({ initial }) => {
 
   useEffect(() => {
     fetchOrders()
+
     let timer = setInterval(() => {
       fetchOrders()
     }, 60000)

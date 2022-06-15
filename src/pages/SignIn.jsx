@@ -136,18 +136,6 @@ const App = () => {
             />
           </Form.Item>
           <Form.Item>
-            <Form.Item name='remember' valuePropName='checked' noStyle>
-              <Checkbox>Remember me</Checkbox>
-            </Form.Item>
-
-            <Link
-              to='/forgotpassword'
-              className='login-form-forgot text-blue-button float-right'
-            >
-              Forgot password
-            </Link>
-          </Form.Item>
-          <Form.Item>
             <Button
               type='primary'
               htmlType='submit'
