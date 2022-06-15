@@ -1,14 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import {
-  Table,
-  Input,
-  Button,
-  Space,
-  Tooltip,
-  Modal,
-  Spin,
-  message
-} from 'antd'
+import { Table, Input, Button, Space, Tooltip, Modal, Spin,message } from 'antd'
 import {
   SearchOutlined,
   EditOutlined,
@@ -42,11 +33,8 @@ const Promotion = () => {
     setLoading(true)
     try {
       const token = await currentUser.getIdToken()
-      result = await appApi.get(
-        routes.GET_ALL_PROMOTION,
-        routes.getPromotionConfig(token, 'ALL')
-      )
-
+      result = await appApi.get(routes.GET_ALL_PROMOTION, routes.getPromotionConfig(token,'ALL'))
+      
       result = result.data.promotions.map((promotion, index) => ({
         ...promotion,
         key: index
@@ -228,13 +216,15 @@ const Promotion = () => {
         data: {
           id: id
         }
-      })
+      }
+      )
       console.log(result)
-      if (result.data.errCode === 0) {
+      if (result.data.promotion.errCode===0) {
         await fetchPromotion()
-        message.success('Promotion deleted successfully!')
-      } else {
-        message.error(result.data.errMessage)
+        message.success('Promotion deleted successfully!'); 
+      }
+      else {
+        message.error(result.data.promotion.errMessage);
       }
     } catch (err) {
       console.log(err)
@@ -271,14 +261,14 @@ const Promotion = () => {
       ...getColumnSearchProps('value'),
       sorter: (a, b) => sort(a, b, 'value'),
       sortDirections: ['descend', 'ascend'],
-      render: (_, r) => <p className='text-red-500'>{r.value * 100 + '%'}</p>
+      render: (_, r) => <p className='text-red-500'>{r.value*100+'%'}</p>
     },
     {
       title: 'Begin',
       key: 'begin',
       width: 20,
-      ...getColumnSearchProps('begin'),
-      sorter: (a, b) => sort(a, b, 'begin'),
+      ...getColumnSearchProps('date'),
+      sorter: (a, b) => sort(a, b, 'date'),
       sortDirections: ['descend', 'ascend'],
       render: (_, r) => <p>{reformatDate(r.begin)}</p>
     },
@@ -286,8 +276,8 @@ const Promotion = () => {
       title: 'End',
       key: 'end',
       width: 20,
-      ...getColumnSearchProps('end'),
-      sorter: (a, b) => sort(a, b, 'end'),
+      ...getColumnSearchProps('date'),
+      sorter: (a, b) => sort(a, b, 'date'),
       sortDirections: ['descend', 'ascend'],
       render: (_, r) => <p>{reformatDate(r.end)}</p>
     },
@@ -313,7 +303,7 @@ const Promotion = () => {
               icon={<EditOutlined />}
               type='primary'
               className='bg-blue-button'
-              hidden={!role || role === 'staff'}
+              hidden= {(!role || role === 'staff')}
             />
           </Tooltip>
 
@@ -323,7 +313,7 @@ const Promotion = () => {
               danger={true}
               icon={<DeleteOutlined />}
               type='primary'
-              hidden={!role || role === 'staff'}
+              hidden= {(!role || role === 'staff')}
             />
           </Tooltip>
         </div>
@@ -345,7 +335,7 @@ const Promotion = () => {
             type='primary'
             className='bg-blue-button flex items-center justify-center'
             onClick={() => addPromotion()}
-            hidden={!role || role === 'staff'}
+            hidden= {(!role || role === 'staff')}
           >
             <PlusCircleOutlined />
             Add
@@ -355,18 +345,17 @@ const Promotion = () => {
           </Button>
         </div>
       </h1>
-      {loading ? (
-        <Spin />
-      ) : (
-        <Table
-          columns={columns}
-          dataSource={promotion}
-          loading={loading}
-          scroll={{
-            x: 1000
-          }}
+      {loading?
+        <Spin/>
+        : <Table
+        columns={columns}
+        dataSource={promotion}
+        loading={loading}
+        scroll={{
+          x: 1000
+        }}
         />
-      )}
+      }
 
       <FormPromotionModify
         title={currItem ? 'Edit Promotion' : 'Add Promotion'}
