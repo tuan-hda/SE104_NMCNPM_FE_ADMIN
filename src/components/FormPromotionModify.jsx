@@ -84,12 +84,12 @@ const FormPromotionModify = ({
         routes.getAccessTokenHeader(token)
       )
       console.log(result)
-      if (result.data.errCode===0) {
+      if (result.data.promotion.errCode===0) {
         await fetchPromotion()
         message.success('Promotion updated successfully!'); 
       }
       else {
-        message.error(result.data.errMessage);
+        message.error(result.data.promotion.errMessage);
       }
     } catch (err) {
       console.log(err)
@@ -125,7 +125,6 @@ const FormPromotionModify = ({
     // Generate a random id to make sure images' name are not duplicate
     const imageName = v4()
     // Get extension of image (jpg/png)
-    console.log(image.file.name)
     const imageExt = image.file.name.split('.').pop()
     const name = imageName + '.' + imageExt
     const task = storage.ref(`banners/${name}`).put(image.file.originFileObj)
