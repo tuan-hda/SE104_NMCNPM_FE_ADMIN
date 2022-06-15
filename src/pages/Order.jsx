@@ -339,18 +339,18 @@ const Orders = ({ initial }) => {
       sorter: (a, b) => sort(a, b, 'name'),
       sortDirections: ['descend', 'ascend']
     },
-    {
-      title: 'Total',
-      dataIndex: 'total',
-      key: 'total',
-      width: 10,
-      ...getColumnSearchProps('total', null, option),
-      sorter: (a, b) => sort(a, b, 'total'),
-      sortDirections: ['descend', 'ascend'],
-      render: (_, r) => (
-        <span className='text-red-500'>{round2digits(r.total)}</span>
-      )
-    },
+    // {
+    //   title: 'Total',
+    //   dataIndex: 'total',
+    //   key: 'total',
+    //   width: 10,
+    //   ...getColumnSearchProps('total', null, option),
+    //   sorter: (a, b) => sort(a, b, 'total'),
+    //   sortDirections: ['descend', 'ascend'],
+    //   render: (_, r) => (
+    //     <span className='text-red-500'>{round2digits(r.total)}</span>
+    //   )
+    // },
     {
       title: 'Address',
       dataIndex: 'address',

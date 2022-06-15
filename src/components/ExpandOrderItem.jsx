@@ -24,6 +24,7 @@ const ExpandOrderItem = ({ id, currentUser }) => {
         ...routes.getConfirmOrderParams(id)
       })
       setItems(result.data.items)
+      console.log(result.data.items)
     } catch (err) {
       console.log(err)
     } finally {
@@ -33,7 +34,7 @@ const ExpandOrderItem = ({ id, currentUser }) => {
 
   const calculateTotal = items => {
     if (!items || !Array.isArray(items) || !items.length) return
-    return items.reduce((prev, curr) => prev + curr.currentprice, 0)
+    return items.reduce((prev, curr) => prev + curr.currentprice, 1)
   }
 
   return (
