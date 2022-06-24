@@ -12,7 +12,6 @@ import { useSelector } from 'react-redux'
 import removeAccents from '../utils/removeAccents'
 import ExpandOrderItem from '../components/ExpandOrderItem'
 import getProvinceName from '../utils/getProvinceName'
-import round2digits from '../utils/round2digits'
 
 let pending = []
 let rest = []
@@ -25,40 +24,7 @@ const Orders = ({ initial }) => {
   const [searchValues, setSearchValues] = useState({})
   const [searchValues2, setSearchValues2] = useState({})
   const [input, setInput] = useState({})
-  const [restaurants, setRestaurants] = useState([])
   const { currentUser } = useSelector(state => state.user)
-
-  // Fetch restaurants
-  const fetchRestaurant = async () => {
-    try {
-      let result = await appApi.get(
-        routes.GET_RESTAURANT,
-        routes.getRestaurantParams('ALL')
-      )
-      console.log(result.data)
-
-      result = result.data.restaurants.map((restaurant, index) => ({
-        id: restaurant.id,
-        resAddress: restaurant.resAddress,
-        key: index
-      }))
-      // Sort result by id
-      result.sort((a, b) => a.id - b.id)
-
-      setRestaurants(result)
-      console.log(result)
-    } catch (err) {
-      if (err.response) {
-        console.log(err.response.data)
-        console.log(err.response.status)
-        console.log(err.response.headers)
-      } else {
-        console.log(err.message)
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
 
   // Fetch orders
   const fetchOrders = async () => {
@@ -373,18 +339,6 @@ const Orders = ({ initial }) => {
       sorter: (a, b) => sort(a, b, 'name'),
       sortDirections: ['descend', 'ascend']
     },
-    // {
-    //   title: 'Total',
-    //   dataIndex: 'total',
-    //   key: 'total',
-    //   width: 10,
-    //   ...getColumnSearchProps('total', null, option),
-    //   sorter: (a, b) => sort(a, b, 'total'),
-    //   sortDirections: ['descend', 'ascend'],
-    //   render: (_, r) => (
-    //     <span className='text-red-500'>{round2digits(r.total)}</span>
-    //   )
-    // },
     {
       title: 'Address',
       dataIndex: 'address',
@@ -395,9 +349,18 @@ const Orders = ({ initial }) => {
       sortDirections: ['descend', 'ascend']
     },
     {
+      title: 'Phone',
+      dataIndex: 'deliPhoneNum',
+      index: 'deliPhoneNum',
+      width: 15,
+      ...getColumnSearchProps('deliPhoneNum', null, option),
+      sorter: (a, b) => sort(a, b, 'deliPhoneNum'),
+      sortDirections: ['descend', 'ascend']
+    },
+    {
       title: 'Date',
       key: 'date',
-      width: 10,
+      width: 12,
       ...getColumnSearchProps('date', null, option),
       sorter: (a, b) => sort(a, b, 'date'),
       sortDirections: ['descend', 'ascend'],

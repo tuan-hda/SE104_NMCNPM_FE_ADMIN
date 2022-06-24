@@ -1,5 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Table, Input, Button, Space, Tooltip, Modal, Spin,message } from 'antd'
+import {
+  Table,
+  Input,
+  Button,
+  Space,
+  Tooltip,
+  Modal,
+  Spin,
+  message
+} from 'antd'
 import {
   SearchOutlined,
   EditOutlined,
@@ -11,6 +20,7 @@ import * as routes from '../api/apiRoutes'
 import useModal from '../utils/useModal'
 import FormPromotionModify from '../components/FormPromotionModify'
 import { useSelector } from 'react-redux'
+import NotFound from './NotFound'
 import removeAccents from '../utils/removeAccents'
 import moment from 'moment'
 
@@ -33,8 +43,11 @@ const Promotion = () => {
     setLoading(true)
     try {
       const token = await currentUser.getIdToken()
-      result = await appApi.get(routes.GET_ALL_PROMOTION, routes.getPromotionConfig(token,'ALL'))
-      
+      result = await appApi.get(
+        routes.GET_ALL_PROMOTION,
+        routes.getPromotionConfig(token, 'ALL')
+      )
+
       result = result.data.promotions.map((promotion, index) => ({
         ...promotion,
         key: index
@@ -216,15 +229,13 @@ const Promotion = () => {
         data: {
           id: id
         }
-      }
-      )
+      })
       console.log(result)
-      if (result.data.promotion.errCode===0) {
+      if (result.data.promotion.errCode === 0) {
         await fetchPromotion()
-        message.success('Promotion deleted successfully!'); 
-      }
-      else {
-        message.error(result.data.promotion.errMessage);
+        message.success('Promotion deleted successfully!')
+      } else {
+        message.error(result.data.promotion.errMessage)
       }
     } catch (err) {
       console.log(err)
@@ -261,7 +272,7 @@ const Promotion = () => {
       ...getColumnSearchProps('value'),
       sorter: (a, b) => sort(a, b, 'value'),
       sortDirections: ['descend', 'ascend'],
-      render: (_, r) => <p className='text-red-500'>{r.value*100+'%'}</p>
+      render: (_, r) => <p className='text-red-500'>{r.value * 100 + '%'}</p>
     },
     {
       title: 'Begin',
@@ -303,7 +314,7 @@ const Promotion = () => {
               icon={<EditOutlined />}
               type='primary'
               className='bg-blue-button'
-              hidden= {(!role || role === 'staff')}
+              hidden={!role || role === 'staff'}
             />
           </Tooltip>
 
@@ -313,7 +324,7 @@ const Promotion = () => {
               danger={true}
               icon={<DeleteOutlined />}
               type='primary'
-              hidden= {(!role || role === 'staff')}
+              hidden={!role || role === 'staff'}
             />
           </Tooltip>
         </div>
@@ -326,6 +337,8 @@ const Promotion = () => {
     setCurrItem(null)
   }
 
+  if (!role || role === 'staff') return <NotFound isChildComponent />
+
   return (
     <React.Fragment>
       <h1 className='flex items-center justify-between mb-4'>
@@ -335,7 +348,7 @@ const Promotion = () => {
             type='primary'
             className='bg-blue-button flex items-center justify-center'
             onClick={() => addPromotion()}
-            hidden= {(!role || role === 'staff')}
+            hidden={!role || role === 'staff'}
           >
             <PlusCircleOutlined />
             Add
@@ -345,17 +358,18 @@ const Promotion = () => {
           </Button>
         </div>
       </h1>
-      {loading?
-        <Spin/>
-        : <Table
-        columns={columns}
-        dataSource={promotion}
-        loading={loading}
-        scroll={{
-          x: 1000
-        }}
+      {loading ? (
+        <Spin />
+      ) : (
+        <Table
+          columns={columns}
+          dataSource={promotion}
+          loading={loading}
+          scroll={{
+            x: 1000
+          }}
         />
-      }
+      )}
 
       <FormPromotionModify
         title={currItem ? 'Edit Promotion' : 'Add Promotion'}
