@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const appApi = axios.create({
-  baseURL: 'http://localhost:8081/api/'
+  baseURL: 'https://hambursy-server.herokuapp.com/api/'
 })
 
 export default appApi
