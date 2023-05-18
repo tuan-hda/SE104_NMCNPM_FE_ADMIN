@@ -67,7 +67,7 @@ const Main = () => {
             icon={<UserOutlined />}
             className='flex items-center justify-center'
           />
-          <p>Hoàng Đình Anh Tuấn</p>
+          <p>Hambursy's Staff Account</p>
         </Header>
         <Content
           style={{
